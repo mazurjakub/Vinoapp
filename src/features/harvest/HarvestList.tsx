@@ -38,7 +38,6 @@ function HarvestList({ vineyardId }: HarvestListProps) {
 
   return (
     <div className="journal-section">
-      <h2>{t('harvest.title')}</h2>
 
       {yearSummaries.length > 0 && (
         <Suspense fallback={<p className="empty">{t('harvest.chart.loading')}</p>}>

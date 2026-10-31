@@ -30,6 +30,7 @@ function Harvest() {
 
   return (
     <section>
+      <h1>{t('harvest.title')}</h1>
       <HarvestList vineyardId={selectedVineyardId} />
     </section>
   )

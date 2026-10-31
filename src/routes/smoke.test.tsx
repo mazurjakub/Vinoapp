@@ -124,14 +124,14 @@ async function renderPage(path: string, title: string) {
       </SelectedVineyardProvider>
     </MemoryRouter>,
   )
-  await screen.findByRole('heading', { name: title })
+  await screen.findByRole('heading', { level: 1, name: title })
   return container
 }
 
 /** A crash during a later update unmounts everything, so this checks after the data has loaded. */
 async function expectStillRendered(title: string) {
   await new Promise((resolve) => setTimeout(resolve, 150))
-  expect(screen.getByRole('heading', { name: title })).toBeTruthy()
+  expect(screen.getByRole('heading', { level: 1, name: title })).toBeTruthy()
 }
 
 describe('main pages', () => {
