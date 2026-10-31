@@ -28,3 +28,10 @@ backups/
 *.njsproj
 *.sln
 *.sw?
+
+# Other generated and local files
+dev-dist/
+coverage/
+.env
+.env.*
+Thumbs.db
