@@ -1,57 +1,64 @@
-<!--
-File: README.md
-Created: 2026-10-20
-Description: How to run, build, test and deploy the app.
--->
-
 # Vinařský deník
 
-PWA pro malé a domácí vinaře.
+PWA pro malé a domácí vinaře. Z předpovědi Open-Meteo počítá riziko plísně révové (primární infekce a sekundární infekce podle Goidanichova indexu) a padlí (Gubler-Thomas). Obsahuje deník postřiků a prací a záznamy úrody a funguje i offline.
 
-## Spuštění
+## Upozornění
+
+Modely jsou orientační a pro Moravu neověřené. Rozhodnutí o postřiku zůstává na uživateli. Počasí je modelové, nepochází ze stanice ve vinici.
+
+## Stack
+
+Vite, React, TypeScript, Dexie (IndexedDB), i18next, Recharts, vite-plugin-pwa, Vitest.
+
+## Struktura projektu
+
+- `src/rules`: pravidlový engine (výpočty rizika bez vazby na UI), tabulka v `src/goidanich.json`
+- `src/features`, `src/routes`: funkce aplikace a stránky
+- `src/db`: databáze a migrace
+- `src/weather`: stahování počasí z Open-Meteo
+- `src/i18n/locales`: překlady (`cs.json`, `en.json`)
+- Testy: `*.test.ts` a `*.test.tsx` vedle testovaného kódu, smoke testy stránek v `src/routes/smoke.test.tsx`, nastavení testů v `src/test`
+
+## Vývoj
+
+Vyžaduje Node `^22.22.2`, `^24.15.0` nebo `>=26` (viz `engines` v `package.json`).
 
 ```
 npm install
 npm run dev
-```
-
-Otevře se na `http://localhost:5173` (nebo první volný port nad ním).
-
-## Build a lokální ověření produkční verze
-
-```
 npm run build
 npm run preview
-```
-
-`npm run build` spustí `tsc -b` a poté `vite build` do `dist/`. `npm run preview` servíruje přesně to, co šlo do `dist/` — jediný spolehlivý způsob, jak lokálně ověřit service worker a offline chování (`npm run dev` service worker nezapojuje).
-
-## Testy a lint
-
-```
 npm run test
 npm run lint
+npm run typecheck
 ```
+
+`npm run dev` spustí vývojový server na `http://localhost:5173`, bez service workeru. `npm run build` zkontroluje typy a sestaví aplikaci do `dist/`. `npm run preview` servíruje obsah `dist/`, a proto jen na něm lze lokálně ověřit service worker a offline chování.
 
 ## Nasazení na Cloudflare Pages
 
-Repozitář má pro Cloudflare Pages připravené:
-- **`public/_redirects`** — `/*  /index.html  200`, SPA fallback pro `react-router-dom` (bez něj by reload na `/pocasi` apod. vrátil 404).
-- **`public/_headers`** — cache hlavičky: `dist/assets/*` a `workbox-*.js` mají hash v názvu souboru, takže se cachují natrvalo (`immutable`); `sw.js`, `registerSW.js`, `manifest.webmanifest` a `index.html` hash nemají a musí se vždy znovu ověřit, jinak by `autoUpdate` service workeru (viz `vite.config.ts`) mohl uváznout na staré verzi.
+V Cloudflare dashboardu zvolit **Workers & Pages → Create → Pages → Connect to Git**, vybrat repozitář a nastavit:
 
-Oba soubory se při buildu zkopírují z `public/` do `dist/` beze změny — Cloudflare Pages je čte z kořene nasazeného výstupu.
+- **Root directory:** prázdné (kořen repozitáře)
+- **Build command:** `npm run build`
+- **Build output directory:** `dist`
+- **Proměnná prostředí:** `NODE_VERSION` = `24`
 
-### Kroky, které vyžadují přístup k mému účtu (proveď sám)
+Soubory z `public/` se při buildu zkopírují do `dist/` a Cloudflare Pages je čte z kořene nasazeného výstupu:
 
-1. Repozitář push na GitHub/GitLab (pokud tam ještě není).
-2. V Cloudflare dashboardu: **Workers & Pages → Create → Pages → Connect to Git**, vybrat repozitář.
-3. Build nastavení:
-   - **Framework preset:** Vite (nebo None)
-   - **Build command:** `npm run build`
-   - **Build output directory:** `dist`
-   - **Root directory:** `vinar` (pokud Cloudflare Pages nenabídne vlastní pole a bude chtít kořen repa, nastav build command na `cd vinar && npm run build` a output directory na `vinar/dist`)
-4. Node verze: pokud build selže na verzi Node, nastavit v Cloudflare proměnnou prostředí `NODE_VERSION` (doporučeno 20+).
-5. Po prvním nasazení zkontrolovat v prohlížeči: SPA routing (reload na `/pocasi`), instalaci PWA, a že `sw.js`/`manifest.webmanifest` opravdu chodí s `no-cache` (DevTools → Network).
-6. Volitelně nastavit vlastní doménu v **Custom domains**.
+- **`public/_redirects`:** `/*  /index.html  200`, fallback pro routing v prohlížeči. Bez něj by reload na `/pocasi` vrátil 404.
+- **`public/_headers`:** cache hlavičky. `/assets/*` a `workbox-*.js` mají hash v názvu, takže se cachují natrvalo. `sw.js`, `registerSW.js`, `manifest.webmanifest` a `index.html` hash nemají a musí se vždy znovu ověřit, jinak by service worker mohl uváznout na staré verzi.
 
-Nic z výše uvedeného jsem sám nespustil (push, založení Cloudflare projektu) — čeká to na tebe.
+Kontrola po nasazení:
+
+1. Reload na `/pocasi` zobrazí stránku, ne 404.
+2. Aplikace jde nainstalovat jako PWA.
+3. `sw.js` má v DevTools (Network) hlavičku `Cache-Control: no-cache`.
+
+## Data
+
+Všechna data jsou v IndexedDB v prohlížeči. Aplikace nemá backend ani účty. Záloha se dělá exportem do JSON v Nastavení.
+
+## Zdroje počasí
+
+Dny starší než 2 dny pocházejí z Open-Meteo Historical Forecast API, novější dny a předpověď z Forecast API. ERA5 archiv slouží jen jako záloha, když Historical Forecast den nevrátí. Stejné pravidlo platí pro cache, grafy, tabulky i výpočty.
