@@ -1,0 +1,12 @@
+/**
+ * File: tsconfig.json
+ * Created: 2026-10-02
+ * Description: Root TypeScript configuration that references the app and node projects.
+ */
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+}

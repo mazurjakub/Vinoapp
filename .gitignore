@@ -1,0 +1,30 @@
+# File: .gitignore
+# Created: 2026-10-02
+# Description: Files and folders that git should ignore, such as logs, dependencies and build output.
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# IndexedDB exports taken before schema migrations; not for version control.
+backups/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

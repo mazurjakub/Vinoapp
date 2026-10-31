@@ -1,0 +1,404 @@
+{
+  "_meta": {
+    "file": "cs.json",
+    "created": "2026-10-25",
+    "description": "Czech interface texts."
+  },
+  "nav": {
+    "overview": "Přehled",
+    "weather": "Počasí",
+    "journal": "Deník",
+    "harvest": "Úroda",
+    "settings": "Nastavení"
+  },
+  "noVineyard": {
+    "title": "Není vybraná žádná parcela",
+    "action": "Přejít na Přehled"
+  },
+  "overview": {
+    "title": "Přehled",
+    "addVineyardPrompt": "Nejdřív přidejte parcelu na stránce {{settingsLink}}.",
+    "carePlanLink": "Plán péče podle růstové fáze →"
+  },
+  "weather": {
+    "title": "Počasí",
+    "noVineyardPrompt": "Předpověď a riziko chorob se počítají podle polohy parcely. Přidejte a vyberte ji na stránce Přehled.",
+    "noData": "Zatím žádná data",
+    "forecastFrom": "Předpověď z {{datetime}}",
+    "loadForecast": "Načíst předpověď",
+    "updateForecast": "Aktualizovat předpověď",
+    "updating": "Aktualizuji…",
+    "lastDataShown": "Zobrazena jsou poslední stažená data.",
+    "columns": {
+      "day": "Den",
+      "hour": "Hod.",
+      "temperature": "Teplota",
+      "humidity": "Vlhkost",
+      "dewPoint": "Rosný bod",
+      "precipitation": "Srážky"
+    },
+    "fetchFailed": "Nepodařilo se stáhnout počasí."
+  },
+  "weatherChart": {
+    "loading": "Načítám graf…",
+    "caption": "Počasí a rizika za posledních 7 dní a příštích 7 dní",
+    "indicative": "orientační",
+    "summary": "Graf počasí a rizik od {{from}} do {{to}}",
+    "temp": "Průměrná teplota",
+    "precip": "Srážky za den",
+    "rh": "Průměrná vlhkost",
+    "indices": "Goidanich a Gubler-Thomas",
+    "today": "dnes",
+    "goidanich": "Goidanich (inkubace sekundární infekce, orientační)",
+    "gubler": "Gubler-Thomas (padlí, orientační, model z Kalifornie)",
+    "primaryEvent": "Primární infekce plísně",
+    "forecast": "Předpověď (zatím neověřeno archivem)",
+    "panelPrecipTemp": "Srážky a teplota",
+    "forecastBandLabel": "předpověď",
+    "legend": {
+      "tempHistory": "Teplota (historie)",
+      "tempForecast": "Předpověď teploty",
+      "precipThreshold": "Práh srážek",
+      "indexHistory": "Index (historie)",
+      "indexForecast": "Předpověď indexu",
+      "incubationNearEnd": "Inkubace nad 90 %",
+      "incubationEnd": "Konec inkubace (100 %)"
+    },
+    "thresholdPrecip": "práh 10 mm (primární infekce)",
+    "thresholdWarning": "práh 90 %",
+    "thresholdUrgent": "práh 100 %",
+    "riskLabel": "Riziko",
+    "notActive": "zatím neaktivní",
+    "daySummaryHint": "Najeďte myší nebo klikněte na graf pro detail dne.",
+    "tableTitle": "Tabulka hodnot",
+    "sourceForecast": "předpověď",
+    "columns": {
+      "date": "Datum",
+      "source": "Zdroj",
+      "temp": "Teplota",
+      "precip": "Srážky",
+      "rh": "Vlhkost",
+      "event": "Primární",
+      "goidanich": "Goidanich",
+      "gubler": "Gubler-Thomas"
+    },
+    "dev": {
+      "seed": "DEV: naplnit syntetická data",
+      "delete": "DEV: smazat syntetická data"
+    },
+    "noIncubation": "Žádná aktivní inkubace",
+    "cycleComplete": "inkubace skončila {{date}} – zkontrolujte olejové skvrny",
+    "cycleStalled": "inkubace zastavena {{date}} ({{days}} dní bez přírůstku)",
+    "cycleSeasonOver": "sezóna skončila",
+    "gublerLow": "nízké 0–30",
+    "gublerMedium": "střední 40–50",
+    "gublerHigh": "vysoké 60–100",
+    "sourceHistory": "historie"
+  },
+  "journal": {
+    "title": "Deník",
+    "placeholder": "Chronologický seznam postřiků a prací se objeví zde.",
+    "noVineyardPrompt": "Postřiky a práce se zapisují ke konkrétní parcele. Přidejte a vyberte ji na stránce Přehled.",
+    "sprays": {
+      "title": "Postřiky",
+      "add": "Přidat postřik",
+      "empty": "Zatím žádné postřiky.",
+      "targets": {
+        "downy": "Plíseň révová",
+        "powdery": "Padlí révové",
+        "botrytis": "Šedá hniloba",
+        "other": "Jiné"
+      },
+      "form": {
+        "datetime": "Datum a čas",
+        "product": "Přípravek",
+        "activeSubstance": "Účinná látka",
+        "dose": "Dávka",
+        "target": "Cílová choroba",
+        "notes": "Poznámka"
+      }
+    },
+    "works": {
+      "title": "Práce",
+      "add": "Přidat práci",
+      "empty": "Zatím žádné práce.",
+      "types": {
+        "pruning": "Řez",
+        "green_work": "Zelené práce",
+        "fertilizing": "Hnojení",
+        "other": "Jiné"
+      },
+      "form": {
+        "datetime": "Datum a čas",
+        "type": "Typ práce",
+        "notes": "Poznámka",
+        "photo": "Fotka (volitelně)"
+      }
+    },
+    "revokedEvents": {
+      "title": "Zrušené infekční události",
+      "plot": "Parcela: {{name}}",
+      "revokedOn": "Zrušeno {{date}}.",
+      "reasons": {
+        "refinedDataNotMet": "Podmínky po zpřesnění dat nesplněny."
+      }
+    }
+  },
+  "carePlan": {
+    "title": "Plán péče",
+    "noVineyardPrompt": "Plán péče se řídí růstovými fázemi parcely. Přidejte a vyberte ji na stránce Přehled.",
+    "source": "Zdroj:",
+    "currentPhase": "Aktuální fáze: {{phase}}",
+    "noPhase": "Pro letošek není zapsaná žádná růstová fáze. Zobrazuji začátek sezóny.",
+    "headings": {
+      "current": "Na co si dát pozor v tomto stádiu",
+      "upcoming": "Následující stádia",
+      "past": "Prošlá stádia"
+    },
+    "bbch": "BBCH {{from}}–{{to}}",
+    "targets": "Cíle:",
+    "threshold": "Orientační práh:",
+    "inspectionSource": "Zdroj:"
+  },
+  "harvest": {
+    "title": "Úroda",
+    "noVineyardPrompt": "Sklizeň se zapisuje ke konkrétní parcele. Přidejte a vyberte ji na stránce Přehled.",
+    "add": "Přidat sklizeň",
+    "chart": {
+      "loading": "Načítám graf…",
+      "caption": "Celková hmotnost sklizně podle roku (kg)",
+      "summary": "Sloupcový graf hmotnosti sklizně za {{count}} let",
+      "tableHint": "Hodnoty a cukernatost jsou v tabulce níže."
+    },
+    "empty": "Zatím žádné záznamy o sklizni.",
+    "form": {
+      "date": "Datum sklizně",
+      "year": "Ročník",
+      "weightKg": "Hmotnost (kg)",
+      "sugar": "Cukernatost",
+      "sugarUnit": "Jednotka",
+      "notes": "Poznámka"
+    },
+    "summary": {
+      "year": "Ročník",
+      "weightKg": "Hmotnost",
+      "sugar": "Cukernatost (průměr)",
+      "unitMismatch": "jednotky se liší, srovnání nelze"
+    }
+  },
+  "settings": {
+    "title": "Nastavení",
+    "general": {
+      "title": "Obecná nastavení",
+      "sprayWarningDays": "Upozornit po (dnech od posledního postřiku při vysokém riziku)",
+      "sugarUnit": "Jednotka cukernatosti",
+      "language": "Jazyk aplikace"
+    },
+    "data": {
+      "title": "Export a import dat",
+      "hint": "Export uloží všechna vaše data (parcely, odrůdy, růstové fáze, postřiky, práce, úrodu i nastavení) do jednoho JSON souboru. Import nahradí veškerá aktuální data obsahem souboru.",
+      "backupHint": "Data jsou uložená jen v tomto prohlížeči a na tomto zařízení. Na server se nic nezálohuje. Stáhněte export (JSON), hlavně před vymazáním dat prohlížeče, výměnou telefonu nebo přeinstalací aplikace.",
+      "export": "Exportovat data",
+      "exporting": "Exportuji…",
+      "exportError": "Export se nepodařil.",
+      "import": "Importovat data",
+      "importing": "Importuji…",
+      "importConfirm": "Import nahradí všechna aktuální data obsahem souboru. Chcete pokračovat?",
+      "importInvalid": "Soubor nevypadá jako platný export z této aplikace.",
+      "importSuccess": "Data byla úspěšně importována.",
+      "importError": "Import se nepodařil. Zkontrolujte, že je soubor v pořádku."
+    }
+  },
+  "vineyard": {
+    "listTitle": "Parcely",
+    "addVineyard": "Přidat parcelu",
+    "showAll": "Zobrazit všechny parcely ({{count}})",
+    "hideOthers": "Skrýt ostatní parcely",
+    "edit": "Upravit",
+    "delete": "Smazat",
+    "cancel": "Zrušit",
+    "save": "Uložit změny",
+    "add": "Přidat parcelu",
+    "deleteConfirm": "Opravdu chcete smazat parcelu? Smažou se i všechny záznamy postřiků, prací, úrody a růstových fází pro ni.",
+    "growthStage": "Růstová fáze",
+    "hideGrowthStage": "Skrýt růstovou fázi",
+    "empty": "Zatím nemáte žádnou parcelu.",
+    "plantedIn": "Vysazeno {{year}}",
+    "form": {
+      "name": "Název parcely",
+      "variety": "Odrůda",
+      "plantedYear": "Rok výsadby",
+      "area": "Plocha (ha)",
+      "vineHeadCount": "Počet hlav révy",
+      "lat": "Zeměpisná šířka",
+      "lon": "Zeměpisná délka",
+      "useGeolocation": "Použít aktuální polohu",
+      "geolocationUnavailable": "Geolokace není v tomto prohlížeči dostupná.",
+      "geolocationFailed": "Polohu se nepodařilo zjistit.",
+      "regionProfile": "Regionální profil",
+      "regionProfileOptions": {
+        "cz-morava": "ČR – Morava",
+        "eu-generic": "Evropa – obecný"
+      },
+      "regionProfileVerifiedHint": "Prahy jsou částečně ověřené pro Moravskou vinařskou oblast.",
+      "regionProfileGenericHint": "Obecná evropská pravidla, pro tuto oblast neověřená.",
+      "notes": "Poznámky",
+      "invalidCoordinates": "Zeměpisná šířka musí být od -90 do 90 a délka od -180 do 180."
+    }
+  },
+  "risk": {
+    "downyPrimary": "Plíseň révová – primární infekce",
+    "downySecondary": "Plíseň révová – sekundární infekce (Goidanich)",
+    "powdery": "Padlí révové",
+    "today": "Dnes: {{level}}",
+    "levels": {
+      "low": "Nízké",
+      "medium": "Střední",
+      "high": "Vysoké"
+    },
+    "noWeatherData": "Zatím nejsou k dispozici data počasí",
+    "noWeatherDataHint": "Po stažení předpovědi se tady zobrazí riziko chorob pro tuto parcelu.",
+    "downloadForecast": "Stáhnout předpověď",
+    "updatedFrom": "Podle předpovědi z {{datetime}}",
+    "seasonEvents": "Infekčních událostí v sezóně: {{count}}",
+    "noForecastForDay": "Pro dnešek a následující dny zatím nejsou data počasí.",
+    "noPrimaryEventYet": "V aktuálně stažených datech zatím neproběhla primární infekce — sekundární index se nespouští.",
+    "riskLabel": "{{level}} riziko",
+    "daysSinceSpray": "Dní od posledního postřiku: {{count}}",
+    "noSprayLogged": "Zatím nebyl zaznamenán žádný postřik.",
+    "seasonSyncStale": "Sezónní výpočty (SET8,0, Goidanich, Gubler-Thomas) se nepodařilo aktualizovat kvůli síťové chybě. Poslední pokus: {{datetime}}. Zobrazené riziko může být zastaralé."
+  },
+  "growthStage": {
+    "title": "Růstové fáze",
+    "hint": "Každá odrůda raší, kvete a dozrává v jiný termín. Pravidla na tom závisí (je letorost už dost dlouhý? je před květem, nebo po něm? zavírají se hrozny?), takže dvě odrůdy ve stejné vinici mohou potřebovat ochranu v jiný týden.",
+    "stage": "Fáze",
+    "date": "Datum",
+    "add": "Přidat",
+    "delete": "Smazat",
+    "empty": "Zatím žádné záznamy.",
+    "stages": {
+      "budbreak": "Rašení",
+      "shoot10cm": "Letorost 10 cm",
+      "flowering": "Kvetení",
+      "veraison": "Zaměkání",
+      "ripening": "Zrání",
+      "harvest": "Sklizeň"
+    }
+  },
+  "carePlanData": {
+    "disclaimer": "Doporučení z roku 2008 (ekologické hospodaření), není předpis. Přípravky a limity ověřte podle aktuální legislativy.",
+    "source": "FiBL / Bioinstitut, Ochrana révy vinné v ekologickém vinohradnictví před hlavními chorobami a škůdci, s. 2–3, 6–7, 11–12.",
+    "note": "Ekologický plán FiBL / Bioinstitut, ČR úprava 12/2007. Přípravky, dávky a limity jsou z roku 2008.",
+    "inspectionSource": "FiBL / Bioinstitut, s. {{pages}}",
+    "targets": {
+      "mites_calepitrimerus": "Hálčivec révový",
+      "mites_eriophyes": "Vlnovníkovec révový",
+      "phomopsis": "Černá skvrnitost (Phomopsis)",
+      "moths": "Obaleči",
+      "powdery": "Padlí révové",
+      "downy": "Plíseň révová",
+      "red_spot": "Červená spála",
+      "rachis": "Ochrnutí třapiny (odumírání třapiny)",
+      "botrytis": "Plíseň šedá",
+      "spider_mites_panonychus": "Sviluška ovocná",
+      "spider_mites_tetranychus": "Sviluška chmelová",
+      "leafhopper": "Pidikřísek zelenavý"
+    },
+    "stages": {
+      "woollyBud": "Vlna až první zelený bod",
+      "budbreak": "Rašení",
+      "threeLeavesA": "3–4 listy",
+      "threeLeavesB": "3–4 listy",
+      "shoot2030": "Letorost 20–30 cm",
+      "preFlowering": "Krátce před květem",
+      "postFlowering": "Krátce po květu",
+      "bunchFormation": "Tvorba hroznů až uzavírání",
+      "closureStart": "Začátek uzavírání hroznů",
+      "closure": "Uzavírání hroznů"
+    },
+    "inspections": {
+      "mites_calepitrimerus_spring": {
+        "description": "Při rašení (B–D) kontrolovat hálčivce. Larvy se líhnou 8–10 dní po vyrašení.",
+        "threshold": "Průměrně ~90 roztočů na list při rašení (orientační)."
+      },
+      "mites_calepitrimerus_late": {
+        "description": "Znovu kontrolovat v pozdním létě (zaměkání).",
+        "threshold": "Přibližně ~170 roztočů na list koncem léta (orientační)."
+      },
+      "mites_eriophyes_spring": {
+        "description": "Při rašení kontrolovat hlavně starší dolní listy. Vlnovníkovec má až 7 generací.",
+        "threshold": "Bez číselného prahu."
+      },
+      "mites_eriophyes_late": {
+        "description": "V pozdním létě (zaměkání) označit keře s opakovaným silným výskytem. Na jaře před rašením je pak řešit."
+      },
+      "phomopsis_b": {
+        "description": "Kontrola kolem B (01). Napadené dřevo odstranit, rány ošetřit balzámem."
+      },
+      "powdery_e": {
+        "description": "Kontrola padlí při E (3–4 listy). Infekce při vlhkosti nad 80 %, ovlhčení listů není nutné."
+      },
+      "moth_generation_1": {
+        "description": "1. generace obalečů: kontrola feromonovými lapáky mezi H a I. Housenky se líhnou ~7 dní po snůšce.",
+        "threshold": "Číselný práh není. Teploty nad 12–15 °C zvyšují aktivitu housenek."
+      },
+      "moth_generation_2": {
+        "description": "2. generace obalečů: kontrola kolem J (73). Housenky za 4–6 dní vnikají do bobulí."
+      },
+      "spider_mite_panonychus_dormant": {
+        "description": "Kontrola dřeva při řezu: vajíčka na bázích pupenů. Přímá ochrana není potřeba ani možná.",
+        "threshold": "Přes 80 % bází pupenů s vajíčky."
+      },
+      "spider_mite_panonychus_leaves": {
+        "description": "Kontrola listů ve stádiu 3 listů (E).",
+        "threshold": "Přes 70 % listů v E obsazeno."
+      },
+      "spider_mite_tetranychus": {
+        "description": "Kontrola listů na roztoče od května do července.",
+        "threshold": "Květen–červen 30–40 % listů s roztoči; červenec–srpen 20–30 %. V ekologickém vinohradnictví přímá ochrana není možná.",
+        "note": "Kniha uvádí kalendář (květen–červenec), ne BBCH. Rozsah BBCH je přibližný."
+      },
+      "leafhopper_yellow_traps": {
+        "description": "Žluté lepové desky ve stádiu F–H. Kontrola larev na listech."
+      },
+      "leafhopper_generation_1": {
+        "description": "1. generace: kontrola larev na listech ve stádiu I.",
+        "threshold": "4–5 larev na list ve stádiu I (1. generace). Přímá ochrana většinou není nutná."
+      },
+      "leafhopper_generation_2": {
+        "description": "2. generace: kontrola larev na listech ve stádiu L.",
+        "threshold": "4–5 larev na list ve stádiu L (2. generace). Přímá ochrana většinou není nutná."
+      }
+    }
+  },
+  "riskReasons": {
+    "primaryMet": "Primární infekce ({{profile}}): {{conditions}}.",
+    "primaryNotMet": "Podmínky primární infekce plísně révové nebyly splněny.",
+    "meanTemperature": "průměrná teplota {{value}} °C ≥ {{min}} °C",
+    "minimumTemperature": "minimální teplota ≥ {{min}} °C",
+    "temperature": "teplota ≥ {{min}} °C",
+    "precipitation": "srážky {{value}} mm ≥ {{min}} mm/24h",
+    "shootLength": "letorost už dosáhl 10 cm",
+    "oosporesMature": "oospory zralé ({{value}} DS ≥ {{min}})",
+    "leafCheck": "Doporučená kontrola listů za {{days}} dní (inkubace podle teploty {{temperature}} °C).",
+    "goidanichDevelopment": "Rozvoj +{{added}} % (celkem {{total}} %).",
+    "goidanichTooCold": "Průměrná teplota {{temperature}} °C je pod {{min}} °C, inkubace tento den nepostupuje.",
+    "gublerQualified": "Teplota {{min}}–{{max}} °C nepřetržitě ≥ {{hours}} h.",
+    "gublerNotQualified": "Podmínka pro padlí révové nebyla dnes splněna.",
+    "gublerHotDay": "Horký den (≥ {{temperature}} °C): index navíc −10.",
+    "gublerScore": "Gubler-Thomas index: {{score}} bodů.",
+    "gublerNotIgnited": "Index zatím nespuštěn (čeká na {{required}} po sobě jdoucí dny): {{current}}/{{required}}.",
+    "gublerIndicative": "Model z Kalifornie (UC Davis) — orientační odhad, pro Moravu neověřený.",
+    "goidanichRunning": "Infekce z {{start}}: inkubace {{pct}} %.",
+    "goidanichComplete": "Infekce z {{start}}: konec inkubace {{end}}. Zkontrolujte olejové skvrny na listech.",
+    "goidanichStalled": "Infekce z {{start}}: inkubace se zastavila a cyklus skončil {{end}}.",
+    "goidanichNoCycle": "Žádná inkubace teď neběží.",
+    "goidanichNearEnd": "Inkubace je nad {{threshold}} % a stále běží, olejové skvrny se mohou brzy objevit.",
+    "goidanichNewInfection": "Tento den jsou splněné podmínky nové infekce.",
+    "goidanichNoWetHours": "Vlhkost nepřekročila 60 % ve dvou hodinách po sobě, inkubace tento den nepostupuje.",
+    "goidanichIncompleteDay": "Počasí za tento den je neúplné, inkubace tento den nepostupuje."
+  },
+  "common": {
+    "invalidNumber": "Zadejte platné číslo, například 8,5."
+  }
+}

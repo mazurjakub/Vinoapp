@@ -1,0 +1,54 @@
+/**
+ * File: index.css
+ * Created: 2026-10-02
+ * Description: Global base styles and the light and dark theme colour variables.
+ */
+
+:root {
+  --text: #2b2730;
+  --text-h: #08060d;
+  --bg: #fff;
+  --surface: #f6f3f5;
+  --border: #e5e4e7;
+  --accent: #5b2a4a;
+  --accent-contrast: #fff;
+
+  font: 18px/145% system-ui, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #d8d4da;
+    --text-h: #f3f1f4;
+    --bg: #16131a;
+    --surface: #211d26;
+    --border: #35303c;
+    --accent: #c084b0;
+    --accent-contrast: #16131a;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+h1,
+h2 {
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}

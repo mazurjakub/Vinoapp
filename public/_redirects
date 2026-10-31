@@ -1,0 +1,4 @@
+# File: _redirects
+# Created: 2026-10-03
+# Description: Cloudflare Pages rule that sends every route to the single-page app.
+/*  /index.html  200

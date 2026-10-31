@@ -1,0 +1,404 @@
+{
+  "_meta": {
+    "file": "en.json",
+    "created": "2026-10-25",
+    "description": "English interface texts, matching the Czech wording."
+  },
+  "nav": {
+    "overview": "Overview",
+    "weather": "Weather",
+    "journal": "Journal",
+    "harvest": "Harvest",
+    "settings": "Settings"
+  },
+  "noVineyard": {
+    "title": "No plot selected",
+    "action": "Go to Overview"
+  },
+  "overview": {
+    "title": "Overview",
+    "addVineyardPrompt": "First add a plot on the {{settingsLink}} page.",
+    "carePlanLink": "Care plan by growth stage →"
+  },
+  "weather": {
+    "title": "Weather",
+    "noVineyardPrompt": "The forecast and disease risk are calculated from the plot's location. Add and select one on the Overview page.",
+    "noData": "No data yet",
+    "forecastFrom": "Forecast from {{datetime}}",
+    "loadForecast": "Load forecast",
+    "updateForecast": "Update forecast",
+    "updating": "Updating…",
+    "lastDataShown": "Showing the last downloaded data.",
+    "columns": {
+      "day": "Day",
+      "hour": "Hour",
+      "temperature": "Temperature",
+      "humidity": "Humidity",
+      "dewPoint": "Dew point",
+      "precipitation": "Precipitation"
+    },
+    "fetchFailed": "The weather could not be downloaded."
+  },
+  "weatherChart": {
+    "loading": "Loading chart…",
+    "caption": "Weather and risks for the last 7 days and the next 7 days",
+    "indicative": "indicative",
+    "summary": "Weather and risk chart from {{from}} to {{to}}",
+    "temp": "Mean temperature",
+    "precip": "Daily precipitation",
+    "rh": "Mean humidity",
+    "indices": "Goidanich and Gubler-Thomas",
+    "today": "today",
+    "goidanich": "Goidanich (secondary infection incubation, indicative)",
+    "gubler": "Gubler-Thomas (powdery mildew, indicative, Californian model)",
+    "primaryEvent": "Primary downy mildew infection",
+    "forecast": "Forecast (not yet verified by the archive)",
+    "panelPrecipTemp": "Precipitation and temperature",
+    "forecastBandLabel": "forecast",
+    "legend": {
+      "tempHistory": "Temperature (history)",
+      "tempForecast": "Temperature forecast",
+      "precipThreshold": "Precipitation threshold",
+      "indexHistory": "Index (history)",
+      "indexForecast": "Index forecast",
+      "incubationNearEnd": "Incubation above 90%",
+      "incubationEnd": "End of incubation (100%)"
+    },
+    "thresholdPrecip": "threshold 10 mm (primary infection)",
+    "thresholdWarning": "threshold 90%",
+    "thresholdUrgent": "threshold 100%",
+    "riskLabel": "Risk",
+    "notActive": "not active yet",
+    "daySummaryHint": "Hover over or click the chart for a day's detail.",
+    "tableTitle": "Table of values",
+    "sourceForecast": "forecast",
+    "columns": {
+      "date": "Date",
+      "source": "Source",
+      "temp": "Temperature",
+      "precip": "Precipitation",
+      "rh": "Humidity",
+      "event": "Primary",
+      "goidanich": "Goidanich",
+      "gubler": "Gubler-Thomas"
+    },
+    "dev": {
+      "seed": "DEV: fill with synthetic data",
+      "delete": "DEV: delete synthetic data"
+    },
+    "noIncubation": "No active incubation",
+    "cycleComplete": "incubation ended on {{date}} – check for oil spots",
+    "cycleStalled": "incubation stopped on {{date}} ({{days}} days without progress)",
+    "cycleSeasonOver": "season over",
+    "gublerLow": "low 0–30",
+    "gublerMedium": "medium 40–50",
+    "gublerHigh": "high 60–100",
+    "sourceHistory": "history"
+  },
+  "journal": {
+    "title": "Journal",
+    "placeholder": "A chronological list of sprays and work will appear here.",
+    "noVineyardPrompt": "Sprays and work are recorded for a specific plot. Add and select one on the Overview page.",
+    "sprays": {
+      "title": "Sprays",
+      "add": "Add spray",
+      "empty": "No sprays yet.",
+      "targets": {
+        "downy": "Downy mildew",
+        "powdery": "Powdery mildew",
+        "botrytis": "Grey mould",
+        "other": "Other"
+      },
+      "form": {
+        "datetime": "Date and time",
+        "product": "Product",
+        "activeSubstance": "Active substance",
+        "dose": "Dose",
+        "target": "Target disease",
+        "notes": "Notes"
+      }
+    },
+    "works": {
+      "title": "Work",
+      "add": "Add work",
+      "empty": "No work yet.",
+      "types": {
+        "pruning": "Pruning",
+        "green_work": "Green work",
+        "fertilizing": "Fertilizing",
+        "other": "Other"
+      },
+      "form": {
+        "datetime": "Date and time",
+        "type": "Work type",
+        "notes": "Notes",
+        "photo": "Photo (optional)"
+      }
+    },
+    "revokedEvents": {
+      "title": "Revoked infection events",
+      "plot": "Plot: {{name}}",
+      "revokedOn": "Revoked on {{date}}.",
+      "reasons": {
+        "refinedDataNotMet": "Conditions not met after the data was refined."
+      }
+    }
+  },
+  "carePlan": {
+    "title": "Care plan",
+    "noVineyardPrompt": "The care plan follows the plot's growth stages. Add and select one on the Overview page.",
+    "source": "Source:",
+    "currentPhase": "Current stage: {{phase}}",
+    "noPhase": "No growth stage recorded for this season yet. Showing the start of the season.",
+    "headings": {
+      "current": "What to watch for at this stage",
+      "upcoming": "Upcoming stages",
+      "past": "Past stages"
+    },
+    "bbch": "BBCH {{from}}–{{to}}",
+    "targets": "Targets:",
+    "threshold": "Indicative threshold:",
+    "inspectionSource": "Source:"
+  },
+  "harvest": {
+    "title": "Harvest",
+    "noVineyardPrompt": "Harvests are recorded for a specific plot. Add and select one on the Overview page.",
+    "add": "Add harvest",
+    "chart": {
+      "loading": "Loading chart…",
+      "caption": "Total harvest weight per year (kg)",
+      "summary": "Bar chart of harvest weight over {{count}} years",
+      "tableHint": "Values and sugar content are in the table below."
+    },
+    "empty": "No harvest entries yet.",
+    "form": {
+      "date": "Harvest date",
+      "year": "Vintage year",
+      "weightKg": "Weight (kg)",
+      "sugar": "Sugar content",
+      "sugarUnit": "Unit",
+      "notes": "Notes"
+    },
+    "summary": {
+      "year": "Vintage year",
+      "weightKg": "Weight",
+      "sugar": "Sugar content (average)",
+      "unitMismatch": "units differ, can't compare"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "general": {
+      "title": "General settings",
+      "sprayWarningDays": "Warn after (days since last spray at high risk)",
+      "sugarUnit": "Sugar content unit",
+      "language": "App language"
+    },
+    "data": {
+      "title": "Export and import data",
+      "hint": "Export saves all your data (plots, varieties, growth stages, sprays, work, harvests, and settings) into one JSON file. Import replaces all current data with the file's contents.",
+      "backupHint": "Data is stored only in this browser and on this device. Nothing is backed up to a server. Download an export (JSON), especially before clearing browser data, changing phones or reinstalling the app.",
+      "export": "Export data",
+      "exporting": "Exporting…",
+      "exportError": "Export failed.",
+      "import": "Import data",
+      "importing": "Importing…",
+      "importConfirm": "Import will replace all current data with the file's contents. Do you want to continue?",
+      "importInvalid": "This file doesn't look like a valid export from this app.",
+      "importSuccess": "Data imported successfully.",
+      "importError": "Import failed. Check that the file is valid."
+    }
+  },
+  "vineyard": {
+    "listTitle": "Plots",
+    "addVineyard": "Add plot",
+    "showAll": "Show all plots ({{count}})",
+    "hideOthers": "Hide other plots",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save changes",
+    "add": "Add plot",
+    "deleteConfirm": "Do you really want to delete this plot? All its spray, work, harvest and growth stage records will be deleted too.",
+    "growthStage": "Growth stage",
+    "hideGrowthStage": "Hide growth stage",
+    "empty": "You don't have any plots yet.",
+    "plantedIn": "Planted {{year}}",
+    "form": {
+      "name": "Plot name",
+      "variety": "Variety",
+      "plantedYear": "Planting year",
+      "area": "Area (ha)",
+      "vineHeadCount": "Number of vine heads",
+      "lat": "Latitude",
+      "lon": "Longitude",
+      "useGeolocation": "Use current location",
+      "geolocationUnavailable": "Geolocation is not available in this browser.",
+      "geolocationFailed": "Could not determine the location.",
+      "regionProfile": "Regional profile",
+      "regionProfileOptions": {
+        "cz-morava": "Czech Republic – Moravia",
+        "eu-generic": "Europe – generic"
+      },
+      "regionProfileVerifiedHint": "Thresholds are partially verified for the Moravian wine region.",
+      "regionProfileGenericHint": "Generic European rules, unverified for this area.",
+      "notes": "Notes",
+      "invalidCoordinates": "Latitude must be from -90 to 90 and longitude from -180 to 180."
+    }
+  },
+  "risk": {
+    "downyPrimary": "Downy mildew – primary infection",
+    "downySecondary": "Downy mildew – secondary infection (Goidanich)",
+    "powdery": "Powdery mildew",
+    "today": "Today: {{level}}",
+    "levels": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "noWeatherData": "No weather data available yet",
+    "noWeatherDataHint": "Once the forecast is downloaded, the disease risk for this plot will appear here.",
+    "downloadForecast": "Download forecast",
+    "updatedFrom": "Based on the forecast from {{datetime}}",
+    "seasonEvents": "Infection events this season: {{count}}",
+    "noForecastForDay": "No weather data for today or the coming days yet.",
+    "noPrimaryEventYet": "No primary infection has occurred in the currently downloaded data yet — the secondary index hasn't started.",
+    "riskLabel": "{{level}} risk",
+    "daysSinceSpray": "Days since last spray: {{count}}",
+    "noSprayLogged": "No spray logged yet.",
+    "seasonSyncStale": "Season-long calculations (SET8,0, Goidanich, Gubler-Thomas) could not be updated due to a network error. Last attempt: {{datetime}}. The displayed risk may be stale."
+  },
+  "growthStage": {
+    "title": "Growth stages",
+    "hint": "Every variety breaks bud, flowers, and ripens at a different time. The rules depend on it (is the shoot long enough yet? is it before or after flowering? are the bunches closing?), so two varieties in the same vineyard may need protection in a different week.",
+    "stage": "Stage",
+    "date": "Date",
+    "add": "Add",
+    "delete": "Delete",
+    "empty": "No records yet.",
+    "stages": {
+      "budbreak": "Budbreak",
+      "shoot10cm": "Shoot reached 10 cm",
+      "flowering": "Flowering",
+      "veraison": "Veraison",
+      "ripening": "Ripening",
+      "harvest": "Harvest"
+    }
+  },
+  "carePlanData": {
+    "disclaimer": "Recommendations from 2008 (organic farming), not a regulation. Check products and limits against current legislation.",
+    "source": "FiBL / Bioinstitut, Ochrana révy vinné v ekologickém vinohradnictví před hlavními chorobami a škůdci (Czech edition), pp. 2–3, 6–7, 11–12.",
+    "note": "FiBL / Bioinstitut organic plan, Czech adaptation 12/2007. Products, doses and limits are from 2008.",
+    "inspectionSource": "FiBL / Bioinstitut, p. {{pages}}",
+    "targets": {
+      "mites_calepitrimerus": "Grape rust mite",
+      "mites_eriophyes": "Grape erineum mite",
+      "phomopsis": "Phomopsis cane and leaf spot",
+      "moths": "Grape moths",
+      "powdery": "Powdery mildew",
+      "downy": "Downy mildew",
+      "red_spot": "Red fire disease",
+      "rachis": "Bunch stem necrosis",
+      "botrytis": "Grey mould",
+      "spider_mites_panonychus": "European red mite",
+      "spider_mites_tetranychus": "Two-spotted spider mite",
+      "leafhopper": "Green leafhopper"
+    },
+    "stages": {
+      "woollyBud": "Woolly bud to first green tip",
+      "budbreak": "Budbreak",
+      "threeLeavesA": "3–4 leaves",
+      "threeLeavesB": "3–4 leaves",
+      "shoot2030": "Shoot 20–30 cm",
+      "preFlowering": "Shortly before flowering",
+      "postFlowering": "Shortly after flowering",
+      "bunchFormation": "Bunch formation to closure",
+      "closureStart": "Start of bunch closure",
+      "closure": "Bunch closure"
+    },
+    "inspections": {
+      "mites_calepitrimerus_spring": {
+        "description": "Check for grape rust mites at budbreak (B–D). Larvae hatch 8–10 days after budbreak.",
+        "threshold": "An average of about 90 mites per leaf at budbreak (indicative)."
+      },
+      "mites_calepitrimerus_late": {
+        "description": "Check again in late summer (veraison).",
+        "threshold": "About 170 mites per leaf at the end of summer (indicative)."
+      },
+      "mites_eriophyes_spring": {
+        "description": "At budbreak, check mainly the older lower leaves. The erineum mite has up to 7 generations.",
+        "threshold": "No numeric threshold."
+      },
+      "mites_eriophyes_late": {
+        "description": "In late summer (veraison), mark vines with repeated heavy infestation. Treat them in spring before budbreak."
+      },
+      "phomopsis_b": {
+        "description": "Check around B (01). Remove infected wood and treat the wounds with balm."
+      },
+      "powdery_e": {
+        "description": "Check for powdery mildew at E (3–4 leaves). Infection occurs at humidity above 80%; leaf wetness is not required."
+      },
+      "moth_generation_1": {
+        "description": "1st moth generation: check with pheromone traps between H and I. Caterpillars hatch about 7 days after egg laying.",
+        "threshold": "There is no numeric threshold. Temperatures above 12–15 °C increase caterpillar activity."
+      },
+      "moth_generation_2": {
+        "description": "2nd moth generation: check around J (73). Caterpillars enter the berries within 4–6 days."
+      },
+      "spider_mite_panonychus_dormant": {
+        "description": "Check the wood during pruning for eggs at the bud bases. Direct protection is neither necessary nor possible.",
+        "threshold": "More than 80% of bud bases with eggs."
+      },
+      "spider_mite_panonychus_leaves": {
+        "description": "Check the leaves at the 3-leaf stage (E).",
+        "threshold": "More than 70% of leaves occupied at E."
+      },
+      "spider_mite_tetranychus": {
+        "description": "Check the leaves for mites from May to July.",
+        "threshold": "May–June: 30–40% of leaves with mites; July–August: 20–30%. Direct protection is not possible in organic viticulture.",
+        "note": "The book gives calendar months (May–July), not BBCH. The BBCH range is approximate."
+      },
+      "leafhopper_yellow_traps": {
+        "description": "Yellow sticky traps at stages F–H. Check the leaves for larvae."
+      },
+      "leafhopper_generation_1": {
+        "description": "1st generation: check the leaves for larvae at stage I.",
+        "threshold": "4–5 larvae per leaf at stage I (1st generation). Direct protection is usually not necessary."
+      },
+      "leafhopper_generation_2": {
+        "description": "2nd generation: check the leaves for larvae at stage L.",
+        "threshold": "4–5 larvae per leaf at stage L (2nd generation). Direct protection is usually not necessary."
+      }
+    }
+  },
+  "riskReasons": {
+    "primaryMet": "Primary infection ({{profile}}): {{conditions}}.",
+    "primaryNotMet": "The conditions for primary downy mildew infection were not met.",
+    "meanTemperature": "mean temperature {{value}} °C ≥ {{min}} °C",
+    "minimumTemperature": "minimum temperature ≥ {{min}} °C",
+    "temperature": "temperature ≥ {{min}} °C",
+    "precipitation": "precipitation {{value}} mm ≥ {{min}} mm/24h",
+    "shootLength": "the shoot has reached 10 cm",
+    "oosporesMature": "oospores mature ({{value}} DS ≥ {{min}})",
+    "leafCheck": "Recommended leaf check in {{days}} days (incubation based on a temperature of {{temperature}} °C).",
+    "goidanichDevelopment": "Development +{{added}} % (total {{total}} %).",
+    "goidanichTooCold": "The mean temperature of {{temperature}} °C is below {{min}} °C, so incubation does not progress on this day.",
+    "gublerQualified": "Temperature {{min}}–{{max}} °C continuously for ≥ {{hours}} h.",
+    "gublerNotQualified": "The condition for powdery mildew was not met today.",
+    "gublerHotDay": "Hot day (≥ {{temperature}} °C): an extra −10 to the index.",
+    "gublerScore": "Gubler-Thomas index: {{score}} points.",
+    "gublerNotIgnited": "Index not started yet (waiting for {{required}} consecutive days): {{current}}/{{required}}.",
+    "gublerIndicative": "Californian model (UC Davis) — an indicative estimate, unverified for Moravia.",
+    "goidanichRunning": "Infection from {{start}}: incubation {{pct}}%.",
+    "goidanichComplete": "Infection from {{start}}: incubation ended on {{end}}. Check the leaves for oil spots.",
+    "goidanichStalled": "Infection from {{start}}: incubation stalled and the cycle ended on {{end}}.",
+    "goidanichNoCycle": "No incubation is running now.",
+    "goidanichNearEnd": "Incubation is above {{threshold}}% and still running, so oil spots may appear soon.",
+    "goidanichNewInfection": "The conditions for a new infection are met on this day.",
+    "goidanichNoWetHours": "Humidity did not exceed 60% in two hours in a row, so incubation does not progress on this day.",
+    "goidanichIncompleteDay": "The weather data for this day is incomplete, so incubation does not progress on this day."
+  },
+  "common": {
+    "invalidNumber": "Enter a valid number, for example 8.5."
+  }
+}

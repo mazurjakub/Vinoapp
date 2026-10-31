@@ -1,0 +1,84 @@
+{
+  "_meta": {"file":"goidanich.json","created":"2026-10-02","description":"Goidanich table of daily infection development by temperature and humidity, transcribed from the source paper."},
+  "_source": "Perez-Exposito et al. (2017), VineSens, Sensors 17(3), 465, Table 1 (Goidanich table). Transcribed by hand from a screenshot supplied by the project author.",
+  "_verified": false,
+  "_howToVerify": "Compare every value with Table 1 in https://www.mdpi.com/1424-8220/17/3/465 before use. Add a unit test that asserts the checksums below.",
+  "_notes": [
+    "dailyDevelopmentPct is the percentage of infection development added for one day.",
+    "The paper states that from 25 C the development is constant. The screenshot shows only the first sub-row for 25 C.",
+    "accumulatedPct (0, 25, 50, 75) is an unlabeled sub-column in the screenshot. It is most likely the share of development already accumulated, but this is NOT confirmed. Verify in the paper.",
+    "Suspicious cells (possible typos in the source or in the transcription): 12 C / 0 / rhLt75 = 0 (neighbours are about 4.4); 16 C / 50 / rhLt75 = 6.3 (neighbours 9 and 9.6, probably 9.3); 18 C / 25 / rhGe75 = 15.2 (lower than 15.3 at 0).",
+    "RH threshold is 75 percent. It is not stated whether daily mean RH or hours of RH is meant. Verify in the paper."
+  ],
+  "constantFromTempC": 25,
+  "rhThresholdPct": 75,
+  "rows": [
+    { "tempC": 12, "stages": [
+      { "accumulatedPct": 0,  "rhLt75": 0,     "rhGe75": 5.25 },
+      { "accumulatedPct": 25, "rhLt75": 4.4,   "rhGe75": 5.75 },
+      { "accumulatedPct": 50, "rhLt75": 4.7,   "rhGe75": 6.2 },
+      { "accumulatedPct": 75, "rhLt75": 5,     "rhGe75": 6.7 } ] },
+    { "tempC": 13, "stages": [
+      { "accumulatedPct": 0,  "rhLt75": 5.3,   "rhGe75": 7.1 },
+      { "accumulatedPct": 25, "rhLt75": 5.7,   "rhGe75": 7.7 },
+      { "accumulatedPct": 50, "rhLt75": 6,     "rhGe75": 8 },
+      { "accumulatedPct": 75, "rhLt75": 6.4,   "rhGe75": 8.5 } ] },
+    { "tempC": 14, "stages": [
+      { "accumulatedPct": 0,  "rhLt75": 6.6,   "rhGe75": 9 },
+      { "accumulatedPct": 25, "rhLt75": 6.8,   "rhGe75": 9.4 },
+      { "accumulatedPct": 50, "rhLt75": 7.1,   "rhGe75": 9.7 },
+      { "accumulatedPct": 75, "rhLt75": 7.3,   "rhGe75": 10.2 } ] },
+    { "tempC": 15, "stages": [
+      { "accumulatedPct": 0,  "rhLt75": 7.6,   "rhGe75": 10.6 },
+      { "accumulatedPct": 25, "rhLt75": 7.8,   "rhGe75": 10.8 },
+      { "accumulatedPct": 50, "rhLt75": 8.1,   "rhGe75": 11.1 },
+      { "accumulatedPct": 75, "rhLt75": 8.3,   "rhGe75": 11.3 } ] },
+    { "tempC": 16, "stages": [
+      { "accumulatedPct": 0,  "rhLt75": 8.5,   "rhGe75": 11.7 },
+      { "accumulatedPct": 25, "rhLt75": 9,     "rhGe75": 12 },
+      { "accumulatedPct": 50, "rhLt75": 6.3,   "rhGe75": 12.5 },
+      { "accumulatedPct": 75, "rhLt75": 9.6,   "rhGe75": 12.9 } ] },
+    { "tempC": 17, "stages": [
+      { "accumulatedPct": 0,  "rhLt75": 10,    "rhGe75": 13.25 },
+      { "accumulatedPct": 25, "rhLt75": 10.3,  "rhGe75": 13.6 },
+      { "accumulatedPct": 50, "rhLt75": 10.5,  "rhGe75": 14.3 },
+      { "accumulatedPct": 75, "rhLt75": 10.75, "rhGe75": 14.75 } ] },
+    { "tempC": 18, "stages": [
+      { "accumulatedPct": 0,  "rhLt75": 11.1,  "rhGe75": 15.3 },
+      { "accumulatedPct": 25, "rhLt75": 11.48, "rhGe75": 15.2 },
+      { "accumulatedPct": 50, "rhLt75": 11.7,  "rhGe75": 16 },
+      { "accumulatedPct": 75, "rhLt75": 12.1,  "rhGe75": 16.3 } ] },
+    { "tempC": 19, "stages": [
+      { "accumulatedPct": 0,  "rhLt75": 12.5,  "rhGe75": 16.6 },
+      { "accumulatedPct": 25, "rhLt75": 12.9,  "rhGe75": 17.5 },
+      { "accumulatedPct": 50, "rhLt75": 13.4,  "rhGe75": 18.3 },
+      { "accumulatedPct": 75, "rhLt75": 13.7,  "rhGe75": 19.3 } ] },
+    { "tempC": 20, "stages": [
+      { "accumulatedPct": 0,  "rhLt75": 14.2,  "rhGe75": 20 },
+      { "accumulatedPct": 25, "rhLt75": 14.5,  "rhGe75": 20.5 },
+      { "accumulatedPct": 50, "rhLt75": 14.8,  "rhGe75": 21 },
+      { "accumulatedPct": 75, "rhLt75": 15,    "rhGe75": 21.5 } ] },
+    { "tempC": 21, "stages": [
+      { "accumulatedPct": 0,  "rhLt75": 15.3,  "rhGe75": 22.2 },
+      { "accumulatedPct": 25, "rhLt75": 15.7,  "rhGe75": 22.2 },
+      { "accumulatedPct": 50, "rhLt75": 16,    "rhGe75": 22.2 },
+      { "accumulatedPct": 75, "rhLt75": 16.3,  "rhGe75": 22.2 } ] },
+    { "tempC": 22, "stages": [
+      { "accumulatedPct": 0,  "rhLt75": 16.6,  "rhGe75": 22.2 },
+      { "accumulatedPct": 25, "rhLt75": 17,    "rhGe75": 22.2 },
+      { "accumulatedPct": 50, "rhLt75": 17.3,  "rhGe75": 23.5 },
+      { "accumulatedPct": 75, "rhLt75": 17.7,  "rhGe75": 24.4 } ] },
+    { "tempC": 23, "stages": [
+      { "accumulatedPct": 0,  "rhLt75": 18.1,  "rhGe75": 25 },
+      { "accumulatedPct": 25, "rhLt75": 18.1,  "rhGe75": 25 },
+      { "accumulatedPct": 50, "rhLt75": 18.1,  "rhGe75": 25 },
+      { "accumulatedPct": 75, "rhLt75": 18.1,  "rhGe75": 25 } ] },
+    { "tempC": 24, "stages": [
+      { "accumulatedPct": 0,  "rhLt75": 18.1,  "rhGe75": 25 },
+      { "accumulatedPct": 25, "rhLt75": 17.7,  "rhGe75": 24.3 },
+      { "accumulatedPct": 50, "rhLt75": 17.3,  "rhGe75": 23.5 },
+      { "accumulatedPct": 75, "rhLt75": 17,    "rhGe75": 23.2 } ] },
+    { "tempC": 25, "stages": [
+      { "accumulatedPct": 0,  "rhLt75": 16.6,  "rhGe75": 22.2 } ] }
+  ]
+}

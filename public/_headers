@@ -1,0 +1,27 @@
+# File: _headers
+# Created: 2026-10-20
+# Description: Cloudflare Pages HTTP header rules, mainly for caching.
+# Cloudflare Pages header rules. Static assets have a content hash in their
+# filename (dist/assets/*, workbox-*.js), so they're safe to cache forever —
+# a changed file gets a new name instead of overwriting the old one. The
+# service worker, its registration script and the manifest are NOT hashed and
+# must always be revalidated, or a stale version could get stuck permanently
+# (vite-plugin-pwa's `autoUpdate` only works if the browser actually re-checks).
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/workbox-*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/sw.js
+  Cache-Control: no-cache
+
+/registerSW.js
+  Cache-Control: no-cache
+
+/manifest.webmanifest
+  Cache-Control: no-cache
+
+/index.html
+  Cache-Control: no-cache

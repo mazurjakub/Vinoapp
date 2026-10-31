@@ -1,0 +1,563 @@
+{
+  "_meta": {
+    "file": "carePlan.cz-bio.json",
+    "created": "2026-10-03",
+    "description": "Organic care plan data for Czechia: growth stages, treatments and inspections (FiBL / Bioinstitut, 2008). Its display texts are in the translations."
+  },
+  "format": "vinar-careplan-v2",
+  "dataYear": 2008,
+  "targets": [
+    {
+      "id": "mites_calepitrimerus"
+    },
+    {
+      "id": "mites_eriophyes"
+    },
+    {
+      "id": "phomopsis"
+    },
+    {
+      "id": "moths"
+    },
+    {
+      "id": "powdery"
+    },
+    {
+      "id": "downy"
+    },
+    {
+      "id": "red_spot"
+    },
+    {
+      "id": "rachis"
+    },
+    {
+      "id": "botrytis"
+    },
+    {
+      "id": "spider_mites_panonychus"
+    },
+    {
+      "id": "spider_mites_tetranychus"
+    },
+    {
+      "id": "leafhopper"
+    }
+  ],
+  "stages": [
+    {
+      "code": "1",
+      "labelKey": "woollyBud",
+      "bbchFrom": "01",
+      "bbchTo": "07",
+      "targets": [
+        "mites_calepitrimerus",
+        "mites_eriophyes",
+        "phomopsis"
+      ],
+      "treatments": [
+        {
+          "product": "síra",
+          "productGroup": "síra",
+          "doseText": "10–15",
+          "doseUnit": "kg/ha",
+          "doseKgHa": {
+            "min": 10,
+            "max": 15
+          },
+          "targets": [
+            "mites_calepitrimerus",
+            "mites_eriophyes",
+            "phomopsis"
+          ]
+        }
+      ]
+    },
+    {
+      "code": "2",
+      "labelKey": "budbreak",
+      "bbchFrom": "09",
+      "bbchTo": "09",
+      "targets": [
+        "moths"
+      ],
+      "treatments": [
+        {
+          "product": "feromonové matení",
+          "productGroup": "feromony",
+          "doseText": "500 až 250",
+          "doseUnit": "odparníků/ha",
+          "doseKgHa": null,
+          "targets": [
+            "moths"
+          ]
+        }
+      ]
+    },
+    {
+      "code": "2",
+      "labelKey": "threeLeavesA",
+      "bbchFrom": "13",
+      "bbchTo": "14",
+      "targets": [
+        "powdery",
+        "phomopsis"
+      ],
+      "treatments": [
+        {
+          "product": "síra",
+          "productGroup": "síra",
+          "doseText": "5",
+          "doseUnit": "kg/ha",
+          "doseKgHa": {
+            "min": 5,
+            "max": 5
+          },
+          "targets": [
+            "powdery",
+            "phomopsis"
+          ]
+        }
+      ]
+    },
+    {
+      "code": "2",
+      "labelKey": "threeLeavesB",
+      "bbchFrom": "13",
+      "bbchTo": "14",
+      "targets": [
+        "red_spot",
+        "powdery"
+      ],
+      "treatments": [
+        {
+          "product": "Myco-Sin VIN",
+          "productGroup": "jílovitý přípravek",
+          "doseText": "3",
+          "doseUnit": "kg/ha",
+          "doseKgHa": {
+            "min": 3,
+            "max": 3
+          },
+          "targets": [
+            "red_spot",
+            "powdery"
+          ]
+        },
+        {
+          "product": "síra",
+          "productGroup": "síra",
+          "doseText": "4–5",
+          "doseUnit": "kg/ha",
+          "doseKgHa": {
+            "min": 4,
+            "max": 5
+          },
+          "targets": [
+            "red_spot",
+            "powdery"
+          ],
+          "optional": true
+        }
+      ]
+    },
+    {
+      "code": "3",
+      "labelKey": "shoot2030",
+      "bbchFrom": "53",
+      "bbchTo": "53",
+      "targets": [
+        "powdery",
+        "downy",
+        "red_spot"
+      ],
+      "treatments": [
+        {
+          "product": "Myco-Sin VIN + síra",
+          "productGroup": "jílovitý přípravek + síra",
+          "doseText": "3–4 + 3–4",
+          "doseUnit": "kg/ha",
+          "doseKgHa": null,
+          "targets": [
+            "powdery",
+            "downy",
+            "red_spot"
+          ]
+        }
+      ]
+    },
+    {
+      "code": "4",
+      "labelKey": "preFlowering",
+      "bbchFrom": "57",
+      "bbchTo": "61",
+      "targets": [
+        "downy",
+        "powdery",
+        "red_spot"
+      ],
+      "treatments": [
+        {
+          "product": "Myco-Sin VIN + síra",
+          "productGroup": "jílovitý přípravek + síra",
+          "doseText": "3–4 + 3–4",
+          "doseUnit": "kg/ha",
+          "doseKgHa": null,
+          "group": "A",
+          "targets": [
+            "downy",
+            "powdery",
+            "red_spot"
+          ]
+        },
+        {
+          "product": "měď + síra",
+          "productGroup": "měď + síra",
+          "doseText": "0,4–0,6 + 3–5",
+          "doseUnit": null,
+          "doseKgHa": null,
+          "group": "B",
+          "targets": [
+            "downy",
+            "powdery",
+            "red_spot"
+          ]
+        }
+      ]
+    },
+    {
+      "code": "5",
+      "labelKey": "postFlowering",
+      "bbchFrom": "69",
+      "bbchTo": "73",
+      "targets": [
+        "downy",
+        "powdery",
+        "red_spot",
+        "rachis"
+      ],
+      "treatments": [
+        {
+          "product": "hydroxid měďnatý + fenyklový olej + draselné vodní sklo",
+          "productGroup": "měď + fenyklový olej + draselné vodní sklo",
+          "doseText": "1,5 + 2 + 2",
+          "doseUnit": null,
+          "doseKgHa": null,
+          "group": "A",
+          "targets": [
+            "downy",
+            "powdery",
+            "red_spot"
+          ]
+        },
+        {
+          "product": "Myco-Sin VIN + síra",
+          "productGroup": "jílovitý přípravek + síra",
+          "doseText": "3–4 + 3–4",
+          "doseUnit": "kg/ha",
+          "doseKgHa": null,
+          "group": "B",
+          "targets": [
+            "downy",
+            "powdery",
+            "red_spot"
+          ]
+        },
+        {
+          "product": "síran hořečnatý",
+          "productGroup": "hořčík",
+          "doseText": "7",
+          "doseUnit": "kg/ha",
+          "doseKgHa": {
+            "min": 7,
+            "max": 7
+          },
+          "targets": [
+            "rachis"
+          ]
+        }
+      ]
+    },
+    {
+      "code": "6",
+      "labelKey": "bunchFormation",
+      "bbchFrom": "73",
+      "bbchTo": "75",
+      "targets": [
+        "downy",
+        "powdery",
+        "rachis",
+        "moths"
+      ],
+      "treatments": [
+        {
+          "product": "Myco-Sin VIN + síra",
+          "productGroup": "jílovitý přípravek + síra",
+          "doseText": "6 + 4–6",
+          "doseUnit": "kg/ha",
+          "doseKgHa": null,
+          "targets": [
+            "downy",
+            "powdery"
+          ]
+        },
+        {
+          "product": "Oicomb + měď",
+          "productGroup": "neurčeno + měď",
+          "doseText": "2,5+2,5 + 0,8–1",
+          "doseUnit": null,
+          "doseKgHa": null,
+          "targets": [
+            "downy",
+            "powdery"
+          ]
+        },
+        {
+          "product": "HF Mycol + VitiSan",
+          "productGroup": "fenyklový olej + neurčeno",
+          "doseText": "4–5 + 10",
+          "doseUnit": null,
+          "doseKgHa": null,
+          "targets": [
+            "downy",
+            "powdery"
+          ]
+        },
+        {
+          "product": "síran hořečnatý",
+          "productGroup": "hořčík",
+          "doseText": "7",
+          "doseUnit": "kg/ha",
+          "doseKgHa": {
+            "min": 7,
+            "max": 7
+          },
+          "targets": [
+            "rachis"
+          ]
+        },
+        {
+          "product": "Bacillus thuringiensis (Biobit XL)",
+          "productGroup": "biologický (Bacillus thuringiensis)",
+          "doseText": "1,5–2",
+          "doseUnit": "l/ha",
+          "doseKgHa": null,
+          "targets": [
+            "moths"
+          ],
+          "note": "biologický přípravek"
+        }
+      ]
+    },
+    {
+      "code": "7",
+      "labelKey": "closureStart",
+      "bbchFrom": "77",
+      "bbchTo": "77",
+      "targets": [
+        "downy",
+        "powdery",
+        "moths"
+      ],
+      "treatments": [
+        {
+          "product": "měď + síra",
+          "productGroup": "měď + síra",
+          "doseText": "0,6–0,8 + 2–4",
+          "doseUnit": null,
+          "doseKgHa": null,
+          "group": "A",
+          "targets": [
+            "downy",
+            "powdery"
+          ]
+        },
+        {
+          "product": "Myco-Sin VIN + síra",
+          "productGroup": "jílovitý přípravek + síra",
+          "doseText": "6 + 4–6",
+          "doseUnit": "kg/ha",
+          "doseKgHa": null,
+          "group": "B",
+          "targets": [
+            "downy",
+            "powdery"
+          ]
+        },
+        {
+          "product": "HF Mycol",
+          "productGroup": "fenyklový olej",
+          "doseText": "4",
+          "doseUnit": "l/ha",
+          "doseKgHa": null,
+          "targets": [
+            "downy",
+            "powdery"
+          ]
+        },
+        {
+          "product": "Bacillus thuringiensis (Biobit XL)",
+          "productGroup": "biologický (Bacillus thuringiensis)",
+          "doseText": "1,5–2",
+          "doseUnit": "l/ha",
+          "doseKgHa": null,
+          "targets": [
+            "moths"
+          ],
+          "note": "biologický přípravek"
+        }
+      ]
+    },
+    {
+      "code": "8",
+      "labelKey": "closure",
+      "bbchFrom": "81",
+      "bbchTo": "81",
+      "targets": [
+        "downy",
+        "powdery",
+        "botrytis",
+        "rachis"
+      ],
+      "treatments": [
+        {
+          "product": "měď + Oicomb",
+          "productGroup": "měď + neurčeno",
+          "doseText": "1,5 + 2,5+2,5",
+          "doseUnit": null,
+          "doseKgHa": null,
+          "targets": [
+            "downy",
+            "powdery",
+            "botrytis"
+          ]
+        },
+        {
+          "product": "měď + VitiSan",
+          "productGroup": "měď + neurčeno",
+          "doseText": "1,5 + 10",
+          "doseUnit": null,
+          "doseKgHa": null,
+          "targets": [
+            "downy",
+            "powdery",
+            "botrytis"
+          ]
+        },
+        {
+          "product": "síran hořečnatý",
+          "productGroup": "hořčík",
+          "doseText": "8–10",
+          "doseUnit": "kg/ha",
+          "doseKgHa": {
+            "min": 8,
+            "max": 10
+          },
+          "targets": [
+            "rachis"
+          ]
+        }
+      ]
+    }
+  ],
+  "inspections": [
+    {
+      "id": "mites_calepitrimerus_spring",
+      "target": "mites_calepitrimerus",
+      "bbchFrom": "01",
+      "bbchTo": "09",
+      "sourcePages": "12–16"
+    },
+    {
+      "id": "mites_calepitrimerus_late",
+      "target": "mites_calepitrimerus",
+      "bbchFrom": "81",
+      "bbchTo": "81",
+      "sourcePages": "12–16"
+    },
+    {
+      "id": "mites_eriophyes_spring",
+      "target": "mites_eriophyes",
+      "bbchFrom": "01",
+      "bbchTo": "09",
+      "sourcePages": "12–16"
+    },
+    {
+      "id": "mites_eriophyes_late",
+      "target": "mites_eriophyes",
+      "bbchFrom": "81",
+      "bbchTo": "81",
+      "sourcePages": "12–16"
+    },
+    {
+      "id": "phomopsis_b",
+      "target": "phomopsis",
+      "bbchFrom": "01",
+      "bbchTo": "01",
+      "sourcePages": "10"
+    },
+    {
+      "id": "powdery_e",
+      "target": "powdery",
+      "bbchFrom": "13",
+      "bbchTo": "13",
+      "sourcePages": "9"
+    },
+    {
+      "id": "moth_generation_1",
+      "target": "moths",
+      "bbchFrom": "57",
+      "bbchTo": "65",
+      "sourcePages": "12–16"
+    },
+    {
+      "id": "moth_generation_2",
+      "target": "moths",
+      "bbchFrom": "73",
+      "bbchTo": "73",
+      "sourcePages": "12–16"
+    },
+    {
+      "id": "spider_mite_panonychus_dormant",
+      "target": "spider_mites_panonychus",
+      "bbchFrom": "00",
+      "bbchTo": "01",
+      "sourcePages": "12–16"
+    },
+    {
+      "id": "spider_mite_panonychus_leaves",
+      "target": "spider_mites_panonychus",
+      "bbchFrom": "13",
+      "bbchTo": "13",
+      "sourcePages": "12–16"
+    },
+    {
+      "id": "spider_mite_tetranychus",
+      "target": "spider_mites_tetranychus",
+      "bbchFrom": "53",
+      "bbchTo": "73",
+      "sourcePages": "12–16"
+    },
+    {
+      "id": "leafhopper_yellow_traps",
+      "target": "leafhopper",
+      "bbchFrom": "15",
+      "bbchTo": "57",
+      "sourcePages": "12–16"
+    },
+    {
+      "id": "leafhopper_generation_1",
+      "target": "leafhopper",
+      "bbchFrom": "65",
+      "bbchTo": "65",
+      "sourcePages": "12–16"
+    },
+    {
+      "id": "leafhopper_generation_2",
+      "target": "leafhopper",
+      "bbchFrom": "77",
+      "bbchTo": "77",
+      "sourcePages": "12–16"
+    }
+  ]
+}
