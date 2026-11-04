@@ -196,7 +196,7 @@
     "title": "Nastavení",
     "general": {
       "title": "Obecná nastavení",
-      "sprayWarningDays": "Upozornit po (dnech od posledního postřiku při vysokém riziku)",
+      "sprayWarningDays": "Upozornit po (dnech od posledního postřiku během sezóny)",
       "sugarUnit": "Jednotka cukernatosti",
       "language": "Jazyk aplikace"
     },
@@ -270,7 +270,14 @@
     "riskLabel": "{{level}} riziko",
     "daysSinceSpray": "Dní od posledního postřiku: {{count}}",
     "noSprayLogged": "Zatím nebyl zaznamenán žádný postřik.",
-    "seasonSyncStale": "Sezónní výpočty (SET8,0, Goidanich, Gubler-Thomas) se nepodařilo aktualizovat kvůli síťové chybě. Poslední pokus: {{datetime}}. Zobrazené riziko může být zastaralé."
+    "seasonSyncStale": "Sezónní výpočty (SET8,0, Goidanich, Gubler-Thomas) se nepodařilo aktualizovat kvůli síťové chybě. Poslední pokus: {{datetime}}. Zobrazené riziko může být zastaralé.",
+    "sprayInterval": {
+      "title": "Zvažte další postřik",
+      "titleUrgent": "Zvažte další postřik co nejdřív",
+      "sinceSpray": "Ochrana z posledního postřiku ({{date}}) už nemusí působit. Dní od postřiku: {{days}}, nastavený limit: {{limit}}.",
+      "sinceInfection": "Od {{date}} hrozí v sezóně infekce a postřik proti této chorobě zatím není zapsaný. Dní od té doby: {{days}}, nastavený limit: {{limit}}.",
+      "highRiskAhead": "Ve výhledu na 7 dní je vysoké riziko."
+    }
   },
   "growthStage": {
     "title": "Růstové fáze",

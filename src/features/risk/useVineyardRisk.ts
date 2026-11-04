@@ -9,6 +9,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../../db'
 import type { HourlyWeather, InfectionEvent } from '../../db/schema'
 import { getSetting } from '../../db/settingsRepo'
+import { DEFAULT_SPRAY_WARNING_DAYS, SETTINGS_KEYS } from '../../db/settingsKeys'
 import {
   addDaysUTC,
   daysBetween,
@@ -31,6 +32,7 @@ import { countSeasonInfectionEvents, isActiveInfectionEvent } from './infectionE
 import { resolveGoidanichActiveSince } from './goidanichActivation'
 import { syncVineyardSeasonStateOnce, type SyncSeasonStateResult } from './syncSeasonState'
 import type { DailyAccumulatorRecord } from './dailyAccumulator'
+import { getSprayIntervalAnchors, hasHighRiskAhead, sprayIntervalWarning } from './sprayInterval'
 
 function filterHourlyFrom(hourly: HourlyWeather[], fromDateInclusive: string): HourlyWeather[] {
   return hourly.filter((h) => h.time.slice(0, 10) >= fromDateInclusive)
@@ -93,6 +95,15 @@ export function useVineyardRisk(vineyardId: number | undefined) {
   const gublerThomasRecord = useLiveQuery(
     () => (vineyard ? getSetting<DailyAccumulatorRecord<GublerThomasState>>(`gublerThomasState:${vineyard.id}:${year}`) : undefined),
     [vineyard?.id, year],
+  )
+  const sprayWarningDays = useLiveQuery(() => getSetting<number>(SETTINGS_KEYS.sprayWarningDays), [])
+  const downySprayAnchors = useLiveQuery(
+    () => (vineyardId ? getSprayIntervalAnchors(vineyardId, year, 'downy') : undefined),
+    [vineyardId, year],
+  )
+  const powderySprayAnchors = useLiveQuery(
+    () => (vineyardId ? getSprayIntervalAnchors(vineyardId, year, 'powdery') : undefined),
+    [vineyardId, year],
   )
   // Whether the last sync succeeded, so the UI can warn about incomplete data.
   const lastSeasonSync = useLiveQuery(
@@ -161,7 +172,27 @@ export function useVineyardRisk(vineyardId: number | undefined) {
       matchingGublerRecord?.state ?? gublerStart.initialState,
     )
 
-    return { primary, secondary, powdery, fetchedAt: cache.fetchedAt }
+    const today = localDateKey(new Date())
+    const sprayWarning = (anchors: typeof downySprayAnchors, results: typeof primary) =>
+      anchors
+        ? sprayIntervalWarning({
+            ...anchors,
+            today,
+            warningDays: sprayWarningDays ?? DEFAULT_SPRAY_WARNING_DAYS,
+            harvestDate: phenology.harvest,
+            seasonEndMonthDay: profile.secondaryInfection.seasonEndMonthDay,
+            highRiskAhead: hasHighRiskAhead(results, today),
+          })
+        : null
+
+    return {
+      primary,
+      secondary,
+      powdery,
+      fetchedAt: cache.fetchedAt,
+      downySprayWarning: sprayWarning(downySprayAnchors, [...primary, ...secondary]),
+      powderySprayWarning: sprayWarning(powderySprayAnchors, powdery),
+    }
   }, [
     vineyard,
     cache,
@@ -173,6 +204,9 @@ export function useVineyardRisk(vineyardId: number | undefined) {
     seasonPrimaryEvents,
     lastPowderySprayDatetime,
     year,
+    sprayWarningDays,
+    downySprayAnchors,
+    powderySprayAnchors,
   ])
 
   // Sync the season state, skipped when nothing changed.

@@ -299,6 +299,24 @@ button {
   margin: 0 0 8px;
 }
 
+.risk-spray-warning {
+  background: var(--surface);
+  border-left: 4px solid #fab219;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+
+.risk-spray-warning p {
+  margin: 4px 0 0;
+}
+
+.risk-spray-warning.urgent {
+  background: #fab219;
+  color: #1a1206;
+}
+
 .risk-strip {
   display: flex;
   gap: 6px;

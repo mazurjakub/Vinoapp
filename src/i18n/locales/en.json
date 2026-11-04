@@ -196,7 +196,7 @@
     "title": "Settings",
     "general": {
       "title": "General settings",
-      "sprayWarningDays": "Warn after (days since last spray at high risk)",
+      "sprayWarningDays": "Warn after (days since the last spray during the season)",
       "sugarUnit": "Sugar content unit",
       "language": "App language"
     },
@@ -270,7 +270,14 @@
     "riskLabel": "{{level}} risk",
     "daysSinceSpray": "Days since last spray: {{count}}",
     "noSprayLogged": "No spray logged yet.",
-    "seasonSyncStale": "Season-long calculations (SET8,0, Goidanich, Gubler-Thomas) could not be updated due to a network error. Last attempt: {{datetime}}. The displayed risk may be stale."
+    "seasonSyncStale": "Season-long calculations (SET8,0, Goidanich, Gubler-Thomas) could not be updated due to a network error. Last attempt: {{datetime}}. The displayed risk may be stale.",
+    "sprayInterval": {
+      "title": "Consider another spray",
+      "titleUrgent": "Consider another spray soon",
+      "sinceSpray": "The protection from the last spray ({{date}}) may have run out. Days since the spray: {{days}}, set limit: {{limit}}.",
+      "sinceInfection": "An infection has been possible since {{date}} and no spray against this disease is logged this season. Days since then: {{days}}, set limit: {{limit}}.",
+      "highRiskAhead": "The 7-day outlook shows high risk."
+    }
   },
   "growthStage": {
     "title": "Growth stages",

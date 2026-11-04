@@ -49,6 +49,7 @@ function RiskPanel({ vineyardId }: RiskPanelProps) {
         title={t('risk.downyPrimary')}
         results={risk.primary}
         daysSinceSpray={risk.daysSinceDownySpray}
+        sprayWarning={risk.downySprayWarning}
       />
       {risk.secondaryActive && (
         <RiskDiseaseBlock
@@ -62,6 +63,7 @@ function RiskPanel({ vineyardId }: RiskPanelProps) {
         title={t('risk.powdery')}
         results={risk.powdery}
         daysSinceSpray={risk.daysSincePowderySpray}
+        sprayWarning={risk.powderySprayWarning}
       />
     </div>
   )

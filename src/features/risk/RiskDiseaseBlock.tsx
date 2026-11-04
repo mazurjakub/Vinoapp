@@ -11,16 +11,18 @@ import { toIntlLocale } from '../../i18n'
 import { formatDateLong, formatWeekday, localDateKey } from '../weather/format'
 import { RISK_CLASS, RISK_LABEL_KEYS } from './riskLabels'
 import { formatRiskReason } from './riskReasonText'
+import type { SprayIntervalWarning } from './sprayInterval'
 
 interface RiskDiseaseBlockProps {
   title: string
   results: RiskResult[]
   daysSinceSpray?: number | null
+  sprayWarning?: SprayIntervalWarning | null
   /** Shows today's first reason under the title, for a disease whose state matters more than its level. */
   showStatus?: boolean
 }
 
-function RiskDiseaseBlock({ title, results, daysSinceSpray, showStatus }: RiskDiseaseBlockProps) {
+function RiskDiseaseBlock({ title, results, daysSinceSpray, sprayWarning, showStatus }: RiskDiseaseBlockProps) {
   const { t, i18n } = useTranslation()
   const locale = toIntlLocale(i18n.language)
   const todayKey = localDateKey(new Date())
@@ -48,6 +50,14 @@ function RiskDiseaseBlock({ title, results, daysSinceSpray, showStatus }: RiskDi
             ? t('risk.noSprayLogged')
             : t('risk.daysSinceSpray', { count: daysSinceSpray })}
         </p>
+      )}
+      {sprayWarning && (
+        <div className={`risk-spray-warning${sprayWarning.urgent ? ' urgent' : ''}`} role="status">
+          <strong>{t(sprayWarning.urgent ? 'risk.sprayInterval.titleUrgent' : 'risk.sprayInterval.title')}</strong>
+          {sprayWarning.reasons.map((reason, i) => (
+            <p key={i}>{formatRiskReason(t, reason, locale)}</p>
+          ))}
+        </div>
       )}
       {forecast.length === 0 ? (
         <p className="empty">{t('risk.noForecastForDay')}</p>
