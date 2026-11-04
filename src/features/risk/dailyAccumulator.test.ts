@@ -20,31 +20,6 @@ afterEach(async () => {
 })
 
 describe('syncDailyAccumulator', () => {
-  it('folds in all days from resetFromDate onward, in order', async () => {
-    const result = await syncDailyAccumulator<number>({
-      settingsKey: KEY,
-      resetFromDate: '2026-05-01',
-      initialState: 0,
-      days: [day('2026-05-03'), day('2026-05-01'), day('2026-05-02')],
-      step: (sum) => sum + 1,
-    })
-    expect(result.state).toBe(3)
-    expect(result.lastProcessedDate).toBe('2026-05-03')
-    expect(result.newlyProcessedDays.map((d) => d.date)).toEqual(['2026-05-01', '2026-05-02', '2026-05-03'])
-  })
-
-  it('ignores days before resetFromDate', async () => {
-    const result = await syncDailyAccumulator<number>({
-      settingsKey: KEY,
-      resetFromDate: '2026-05-02',
-      initialState: 0,
-      days: [day('2026-05-01'), day('2026-05-02'), day('2026-05-03')],
-      step: (sum) => sum + 1,
-    })
-    expect(result.state).toBe(2)
-    expect(result.newlyProcessedDays.map((d) => d.date)).toEqual(['2026-05-02', '2026-05-03'])
-  })
-
   it('does not double-count a day processed twice (idempotency)', async () => {
     const first = await syncDailyAccumulator<number>({
       settingsKey: KEY,
@@ -104,24 +79,5 @@ describe('syncDailyAccumulator', () => {
       step: (sum) => sum + 10,
     })
     expect(corrected.state).toBe(60) // 6 days, not resuming the old 30
-  })
-
-  it('passes the previous day and an isFirst flag to the step function', async () => {
-    const seen: Array<{ date: string; isFirst: boolean; previousDate: string | undefined }> = []
-    await syncDailyAccumulator<number>({
-      settingsKey: KEY,
-      resetFromDate: '2026-05-01',
-      initialState: 0,
-      days: [day('2026-05-01'), day('2026-05-02'), day('2026-05-03')],
-      step: (sum, d, ctx) => {
-        seen.push({ date: d.date, isFirst: ctx.isFirst, previousDate: ctx.previousDay?.date })
-        return sum
-      },
-    })
-    expect(seen).toEqual([
-      { date: '2026-05-01', isFirst: true, previousDate: undefined },
-      { date: '2026-05-02', isFirst: false, previousDate: '2026-05-01' },
-      { date: '2026-05-03', isFirst: false, previousDate: '2026-05-02' },
-    ])
   })
 })

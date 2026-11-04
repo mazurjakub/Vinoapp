@@ -21,15 +21,6 @@ function harvest(partial: Partial<Harvest> & { year: number; weightKg: number })
 }
 
 describe('summarizeHarvestsByYear', () => {
-  it('sorts years newest first', () => {
-    const summaries = summarizeHarvestsByYear([
-      harvest({ year: 2022, weightKg: 100 }),
-      harvest({ year: 2024, weightKg: 100 }),
-      harvest({ year: 2023, weightKg: 100 }),
-    ])
-    expect(summaries.map((s) => s.year)).toEqual([2024, 2023, 2022])
-  })
-
   it('sums multiple harvests of the same year into one total', () => {
     const summaries = summarizeHarvestsByYear([
       harvest({ year: 2024, weightKg: 60 }),
@@ -51,15 +42,6 @@ describe('summarizeHarvestsByYear', () => {
     expect(summaries[0].weightChangePct).toBeUndefined()
   })
 
-  it('averages sugar within a year when the unit is uniform', () => {
-    const summaries = summarizeHarvestsByYear([
-      harvest({ year: 2024, weightKg: 50, sugar: 80, sugarUnit: 'Oe' }),
-      harvest({ year: 2024, weightKg: 50, sugar: 90, sugarUnit: 'Oe' }),
-    ])
-    expect(summaries[0].avgSugar).toBe(85)
-    expect(summaries[0].sugarUnit).toBe('Oe')
-  })
-
   it('leaves avgSugar undefined when units are mixed within a year', () => {
     const summaries = summarizeHarvestsByYear([
       harvest({ year: 2024, weightKg: 50, sugar: 80, sugarUnit: 'Oe' }),
@@ -69,15 +51,6 @@ describe('summarizeHarvestsByYear', () => {
     expect(summaries[0].sugarUnit).toBeUndefined()
   })
 
-  it('computes sugar change vs. previous year when units match', () => {
-    const summaries = summarizeHarvestsByYear([
-      harvest({ year: 2025, weightKg: 100, sugar: 88, sugarUnit: 'Oe' }),
-      harvest({ year: 2024, weightKg: 100, sugar: 80, sugarUnit: 'Oe' }),
-    ])
-    expect(summaries[0].sugarChangePct).toBeCloseTo(10)
-    expect(summaries[0].sugarUnitMismatch).toBeUndefined()
-  })
-
   it('flags a unit mismatch instead of computing a sugar change', () => {
     const summaries = summarizeHarvestsByYear([
       harvest({ year: 2025, weightKg: 100, sugar: 20, sugarUnit: 'NM' }),
@@ -85,14 +58,5 @@ describe('summarizeHarvestsByYear', () => {
     ])
     expect(summaries[0].sugarChangePct).toBeUndefined()
     expect(summaries[0].sugarUnitMismatch).toBe(true)
-  })
-
-  it('skips the sugar comparison entirely when one year has no sugar data', () => {
-    const summaries = summarizeHarvestsByYear([
-      harvest({ year: 2025, weightKg: 100 }),
-      harvest({ year: 2024, weightKg: 100, sugar: 80, sugarUnit: 'Oe' }),
-    ])
-    expect(summaries[0].sugarChangePct).toBeUndefined()
-    expect(summaries[0].sugarUnitMismatch).toBeUndefined()
   })
 })

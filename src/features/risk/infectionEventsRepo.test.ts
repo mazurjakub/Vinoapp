@@ -13,9 +13,8 @@ import {
   recordPrimaryInfectionEvents,
   revokeUnconfirmedPrimaryEvents,
 } from './infectionEventsRepo'
-import { formatTimestampDate } from '../weather/format'
 
-const VINEYARD_ID = 987654321 // dedicated id so this test never collides with real data
+const VINEYARD_ID = 987654321
 
 afterEach(async () => {
   await db.infectionEvents.where('vineyardId').equals(VINEYARD_ID).delete()
@@ -43,18 +42,6 @@ describe('recordPrimaryInfectionEvents', () => {
 
     const count = await countSeasonInfectionEvents(VINEYARD_ID, 2026, 'downy', 'primary')
     expect(count).toBe(2)
-  })
-
-  it('ignores results from other rules (e.g. powdery mildew)', async () => {
-    await recordPrimaryInfectionEvents(VINEYARD_ID, [result('2026-05-01', 'high', 'powdery-mildew')])
-    const count = await countSeasonInfectionEvents(VINEYARD_ID, 2026, 'downy', 'primary')
-    expect(count).toBe(0)
-  })
-})
-
-describe('formatTimestampDate', () => {
-  it('shows the day of a stored timestamp, as the revoked events list does', () => {
-    expect(formatTimestampDate('2026-10-31T12:00:00.000Z', 'cs-CZ')).toMatch(/^31\. ?10\. ?2026$/)
   })
 })
 

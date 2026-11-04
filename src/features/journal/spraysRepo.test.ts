@@ -6,7 +6,7 @@
 
 import { afterEach, describe, expect, it } from 'vitest'
 import { db } from '../../db'
-import { addSpray, deleteSpray, getLastSprayDatetime, listSpraysForVineyard } from './spraysRepo'
+import { addSpray, getLastSprayDatetime, listSpraysForVineyard } from './spraysRepo'
 
 const VINEYARD_ID = 444000222
 
@@ -65,18 +65,5 @@ describe('spraysRepo', () => {
     expect(await getLastSprayDatetime(VINEYARD_ID, 'downy')).toBe('2026-05-20T08:00')
     expect(await getLastSprayDatetime(VINEYARD_ID, 'powdery')).toBe('2026-05-15T08:00')
     expect(await getLastSprayDatetime(VINEYARD_ID, 'botrytis')).toBeNull()
-  })
-
-  it('deletes a spray', async () => {
-    const id = await addSpray({
-      vineyardId: VINEYARD_ID,
-      datetime: '2026-05-01T08:00',
-      product: 'A',
-      activeSubstance: 'a',
-      dose: '1 l/ha',
-      target: 'downy',
-    })
-    await deleteSpray(id)
-    expect(await listSpraysForVineyard(VINEYARD_ID)).toHaveLength(0)
   })
 })

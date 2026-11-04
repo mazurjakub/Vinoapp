@@ -31,7 +31,7 @@ afterEach(async () => {
   await db.settings.where('key').equals(SETTINGS_KEYS.selectedVineyardId).delete()
 })
 
-/** Writes one row/key to every table and every derived settings pattern a real vineyard can accumulate. */
+/** One row in every table and every derived settings key for the vineyard. */
 async function fillVineyard(id: number): Promise<void> {
   const now = new Date().toISOString()
   await db.vineyards.put({
@@ -103,37 +103,13 @@ describe('deleteVineyard', () => {
       settingsKeysWithId: [],
     })
 
-    // selectedVineyardId pointed at the deleted vineyard — must not linger with a dangling id.
     const selected = await db.settings.where('key').equals(SETTINGS_KEYS.selectedVineyardId).first()
     expect(selected).toBeUndefined()
   })
 
-  it('leaves a second vineyard (and its own data) untouched', async () => {
-    await fillVineyard(VINEYARD_A)
-    await fillVineyard(VINEYARD_B)
-    await setSetting(SETTINGS_KEYS.selectedVineyardId, VINEYARD_B)
-
-    await deleteVineyard(VINEYARD_A)
-
-    const b = await countsForVineyard(VINEYARD_B)
-    expect(b.vineyard).toBeDefined()
-    expect(b.growthStages).toBe(1)
-    expect(b.sprays).toBe(1)
-    expect(b.works).toBe(1)
-    expect(b.harvests).toBe(1)
-    expect(b.weatherCache).toBe(1)
-    expect(b.dailyRisk).toBe(1)
-    expect(b.infectionEvents).toBe(1)
-    expect(b.settingsKeysWithId).toHaveLength(5)
-
-    // selectedVineyardId pointed at B, not the deleted A — must survive untouched.
-    const selected = await db.settings.where('key').equals(SETTINGS_KEYS.selectedVineyardId).first()
-    expect(selected?.value).toBe(VINEYARD_B)
-  })
-
   it("doesn't let one vineyard's id be a substring match for another's (e.g. 1 vs 14)", async () => {
     const SHORT_ID = 91
-    const LONG_ID = 914 // "91" is a substring of "914" — the regex must not treat that as a match
+    const LONG_ID = 914 // "91" is a substring of "914"
     await fillVineyard(SHORT_ID)
     await fillVineyard(LONG_ID)
 

@@ -10,12 +10,7 @@ import type { DailyRisk } from '../../db/schema'
 /** Fields a sync pass may write; anything else on a row is left alone. */
 export type DailyRiskPatch = Partial<Omit<DailyRisk, 'id' | 'vineyardId' | 'date'>> & { date: string }
 
-/**
- * Merges `patches` into the snapshot rows of one vineyard: fields that are
- * `undefined` in a patch keep their stored value, so the weather pass and the
- * index pass can write the same day independently. Idempotent: writing the
- * same values twice leaves the table unchanged.
- */
+/** Merges patches into the snapshot rows, `undefined` fields keep the stored value. */
 export async function upsertDailyRisk(vineyardId: number, patches: DailyRiskPatch[]): Promise<void> {
   if (patches.length === 0) return
   await db.transaction('rw', db.dailyRisk, async () => {
@@ -39,9 +34,4 @@ export async function listDailyRiskWindow(vineyardId: number, fromDate: string, 
     .and((row) => row.date >= fromDate && row.date <= toDate)
     .toArray()
   return rows.sort((a, b) => a.date.localeCompare(b.date))
-}
-
-/** Used by the forced rebuild after an import: snapshots must match the imported data. */
-export async function clearDailyRisk(vineyardId: number): Promise<void> {
-  await db.dailyRisk.where('vineyardId').equals(vineyardId).delete()
 }

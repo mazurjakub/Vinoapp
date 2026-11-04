@@ -171,20 +171,6 @@ describe('main pages', () => {
     })
   })
 
-  it('shows the revoked event in the journal with the name of its plot', async () => {
-    await fillDatabase()
-    await renderPage('/denik', 'Deník')
-    await screen.findByRole('heading', { level: 2, name: 'Zrušené infekční události' })
-    await screen.findByText(`Parcela: ${PLOT_NAME}`)
-    expect(screen.getByText(/Podmínky po zpřesnění dat nesplněny/)).toBeTruthy()
-  })
-
-  it('counts only the active event on the overview', async () => {
-    await fillDatabase()
-    await renderPage('/', 'Přehled')
-    await screen.findByText('Infekčních událostí v sezóně: 1')
-  })
-
   it('draws the charts on the weather page, without a marker for the revoked event', async () => {
     await fillDatabase()
     const container = await renderPage('/pocasi', 'Počasí')

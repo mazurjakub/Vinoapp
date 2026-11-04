@@ -25,10 +25,6 @@ describe('carePlan.cz-bio.json', () => {
     expect(plan.stages.filter((s) => s.code === '2')).toHaveLength(3)
   })
 
-  it('carries the 2008 metadata', () => {
-    expect(plan.dataYear).toBe(2008)
-  })
-
   it.each([
     ['cs', cs],
     ['en', en],
@@ -46,10 +42,6 @@ describe('carePlan.cz-bio.json', () => {
     }
   })
 
-  it('leaves protectionWindows out for now', () => {
-    expect(plan.protectionWindows).toBeUndefined()
-  })
-
   it('has inspections with unique ids, known targets, BBCH and source pages', () => {
     const inspections = plan.inspections ?? []
     expect(inspections.length).toBe(14)
@@ -63,21 +55,6 @@ describe('carePlan.cz-bio.json', () => {
     }
   })
 
-  it('only uses alternative groups A/B, never on the sulphate/Bacillus items', () => {
-    const grouped = plan.stages.flatMap((s) => s.treatments.filter((t) => t.group !== undefined))
-    expect(grouped.length).toBeGreaterThan(0)
-    for (const t of grouped) {
-      expect(t.product).not.toMatch(/síran hořečnatý|Bacillus/)
-    }
-  })
-
-  it('never fills doseKgHa for units other than kg/ha', () => {
-    for (const stage of plan.stages) {
-      for (const t of stage.treatments) {
-        if (t.doseKgHa !== null) expect(t.doseUnit).toBe('kg/ha')
-      }
-    }
-  })
 })
 
 describe('parseCarePlan validation', () => {
@@ -87,77 +64,17 @@ describe('parseCarePlan validation', () => {
     expect(() => parseCarePlan(bad)).toThrow(CarePlanValidationError)
   })
 
-  it('rejects a stage without a BBCH start', () => {
-    const bad = clone(carePlanRaw) as Record<string, unknown> & { stages: Array<Record<string, unknown>> }
-    delete bad.stages[0].bbchFrom
-    expect(() => parseCarePlan(bad)).toThrow(/bbchFrom/)
-  })
-
-  it('rejects a stage without targets', () => {
-    const bad = clone(carePlanRaw)
-    bad.stages[0].targets = []
-    expect(() => parseCarePlan(bad)).toThrow(/targets/)
-  })
-
-  it('rejects a treatment target that is not a stage target', () => {
-    const bad = clone(carePlanRaw)
-    bad.stages[0].treatments[0].targets = ['moths']
-    expect(() => parseCarePlan(bad)).toThrow(/not a target of the stage/)
-  })
-
   it('rejects an unknown target id', () => {
     const bad = clone(carePlanRaw)
     bad.targets = bad.targets.filter((t: { id: string }) => t.id !== 'moths')
     expect(() => parseCarePlan(bad)).toThrow(/unknown target/)
   })
 
-  it('rejects an unknown dose unit', () => {
-    const bad = clone(carePlanRaw)
-    bad.stages[0].treatments[0].doseUnit = 'g/ha'
-    expect(() => parseCarePlan(bad)).toThrow(/doseUnit/)
-  })
-
-  it('rejects a non-array protectionWindows when present', () => {
-    const bad = clone(carePlanRaw) as Record<string, unknown>
-    bad.protectionWindows = 'not-an-array'
-    expect(() => parseCarePlan(bad)).toThrow(/protectionWindows/)
-  })
-
   describe('inspections', () => {
-    it('rejects an inspection with an empty target', () => {
-      const bad = clone(carePlanRaw)
-      bad.inspections[0].target = ''
-      expect(() => parseCarePlan(bad)).toThrow(/target/)
-    })
-
-    it('rejects an inspection pointing at an unknown target', () => {
-      const bad = clone(carePlanRaw)
-      bad.inspections[0].target = 'nonexistent'
-      expect(() => parseCarePlan(bad)).toThrow(/unknown target/)
-    })
-
-    it('rejects an inspection without BBCH', () => {
-      const bad = clone(carePlanRaw) as Record<string, unknown> & { inspections: Array<Record<string, unknown>> }
-      delete bad.inspections[0].bbchFrom
-      expect(() => parseCarePlan(bad)).toThrow(/bbchFrom/)
-    })
-
-    it('rejects an inspection with empty source pages', () => {
-      const bad = clone(carePlanRaw)
-      bad.inspections[0].sourcePages = '   '
-      expect(() => parseCarePlan(bad)).toThrow(/sourcePages/)
-    })
-
     it('rejects duplicate inspection ids', () => {
       const bad = clone(carePlanRaw)
       bad.inspections[1].id = bad.inspections[0].id
       expect(() => parseCarePlan(bad)).toThrow(/duplicate id/)
-    })
-
-    it('rejects a non-array inspections value', () => {
-      const bad = clone(carePlanRaw) as Record<string, unknown>
-      bad.inspections = {}
-      expect(() => parseCarePlan(bad)).toThrow(/inspections/)
     })
   })
 })

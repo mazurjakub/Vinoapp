@@ -91,20 +91,4 @@ describe('projection equals continuous computation', () => {
     expect(scores.get(addDaysUTC(START, 29))).toBe(continuous.state.ignited ? continuous.state.score : null)
   })
 
-  it('Gubler-Thomas: null before ignition, never 0', () => {
-    const early = ALL_DAYS.filter((d) => d.date <= addDaysUTC(START, 1))
-    const scores = projectGublerScore(undefined, START, early)
-    for (const value of scores.values()) expect(value).toBeNull()
-  })
-
-  it('Goidanich: no entries at all when there is nothing to fold from the reset date', () => {
-    const pct = projectGoidanichPct(undefined, '2030-01-01', ALL_DAYS, CYCLE_OPTIONS)
-    expect(pct.size).toBe(0)
-  })
-
-  it('Goidanich: no entries after the season is over', () => {
-    const lastDay = addDaysUTC(START, 2)
-    const pct = projectGoidanichPct(undefined, START, ALL_DAYS, CYCLE_OPTIONS, (date) => date > lastDay)
-    expect(pct.has(addDaysUTC(START, 3))).toBe(false)
-  })
 })

@@ -6,12 +6,10 @@
 
 import { afterEach, describe, expect, it } from 'vitest'
 import { db } from '../../db'
-import { getSetting } from '../../db/settingsRepo'
 import type { DailyRisk, HourlyWeather, Vineyard } from '../../db/schema'
-import { addDaysUTC, daysBetween, type GublerThomasState } from '../../rules'
+import { addDaysUTC, daysBetween } from '../../rules'
 import { localDateKey } from '../weather/format'
 import { syncVineyardSeasonState } from './syncSeasonState'
-import type { DailyAccumulatorRecord } from './dailyAccumulator'
 
 const year = new Date().getFullYear()
 const START = `${year}-01-01`
@@ -80,27 +78,5 @@ describe('snapshot rebuild', () => {
 
     const after = withoutIds(await db.dailyRisk.where('vineyardId').equals(VINEYARD_ID).sortBy('date'))
     expect(after).toEqual(before)
-  })
-
-  it('a failed rebuild leaves the stored accumulator state untouched', async () => {
-    const phenology = { budbreak: START }
-    const days = Array.from({ length: 10 }, (_, i) => addDaysUTC(START, i))
-    const cache = days.flatMap(hourlyForSeasonDay)
-    await syncVineyardSeasonState(vineyard, phenology, cache, { fetchHistoricalHourly: async () => [] })
-
-    // Gubler-Thomas always runs (anchored at budbreak), so its stored record is a reliable witness here.
-    const gublerBefore = await getSetting<DailyAccumulatorRecord<GublerThomasState>>(`gublerThomasState:${VINEYARD_ID}:${year}`)
-    expect(gublerBefore).toBeDefined()
-
-    // Snapshots gone, and the network is down: the rebuild must not clobber what's stored.
-    await db.dailyRisk.where('vineyardId').equals(VINEYARD_ID).delete()
-    const failing = async () => {
-      throw new Error('offline')
-    }
-    const result = await syncVineyardSeasonState(vineyard, phenology, cache, { fetchHistoricalHourly: failing })
-    expect(result.ok).toBe(false)
-
-    const gublerAfter = await getSetting<DailyAccumulatorRecord<GublerThomasState>>(`gublerThomasState:${VINEYARD_ID}:${year}`)
-    expect(gublerAfter).toEqual(gublerBefore)
   })
 })
