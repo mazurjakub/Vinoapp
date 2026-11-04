@@ -16,7 +16,7 @@ import {
   REGION_PROFILES,
   type RiskReason,
 } from '../../rules'
-import { makeDay } from '../../rules/testUtils'
+import { makeDay } from '../../test/testUtils'
 import { formatRiskReason } from './riskReasonText'
 
 const i18n = createInstance()

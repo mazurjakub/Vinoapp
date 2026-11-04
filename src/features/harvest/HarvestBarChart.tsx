@@ -37,7 +37,7 @@ function HarvestBarChart({ summaries }: HarvestBarChartProps) {
   return (
     <figure className="harvest-chart">
       <figcaption className="weather-chart-caption">{t('harvest.chart.caption')}</figcaption>
-      <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={summary} className="weather-chart-svg">
+      <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={summary} className="harvest-chart-svg">
         <line x1={LEFT} x2={WIDTH - RIGHT} y1={TOP + innerH} y2={TOP + innerH} className="chart-grid" />
         <text x={LEFT - 4} y={TOP + 4} textAnchor="end" className="chart-tick">
           {formatNumber(max, locale, 0)}

@@ -4,7 +4,7 @@
  * Description: Looks up the daily Goidanich infection development in the table.
  */
 
-import goidanichTable from '../goidanich.json'
+import goidanichTable from '../data/goidanich.json'
 
 interface GoidanichStage {
   accumulatedPct: number

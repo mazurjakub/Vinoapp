@@ -1,9 +1,4 @@
 {
-  "_meta": {
-    "file": "carePlan.cz-bio.json",
-    "created": "2026-10-03",
-    "description": "Organic care plan data for Czechia: growth stages, treatments and inspections (FiBL / Bioinstitut, 2008). Its display texts are in the translations."
-  },
   "format": "vinar-careplan-v2",
   "dataYear": 2008,
   "targets": [

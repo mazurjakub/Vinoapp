@@ -6,7 +6,7 @@
 
 import { describe, expect, it } from 'vitest'
 import { GOIDANICH_TABLE_MIN_TEMP_C, goidanichDailyDevelopment, goidanichTableRowTempC } from './goidanichDailyDevelopment'
-import goidanichTable from '../goidanich.json'
+import goidanichTable from '../data/goidanich.json'
 
 describe('goidanichDailyDevelopment - direct table lookups', () => {
   it('matches exact values from the table for a few spot checks', () => {

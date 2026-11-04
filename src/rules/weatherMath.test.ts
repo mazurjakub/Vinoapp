@@ -15,7 +15,7 @@ import {
   groupByDay,
   longestConsecutiveRun,
 } from './weatherMath'
-import { makeDay, makeHour } from './testUtils'
+import { makeDay, makeHour } from '../test/testUtils'
 
 describe('groupByDay', () => {
   it('groups hourly entries by their local date and sorts days chronologically', () => {

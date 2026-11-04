@@ -1,9 +1,4 @@
 {
-  "_meta": {
-    "file": "package.json",
-    "created": "2026-10-02",
-    "description": "npm manifest with the project scripts and dependencies."
-  },
   "name": "vinar",
   "private": true,
   "version": "0.0.0",

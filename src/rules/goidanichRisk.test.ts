@@ -14,7 +14,7 @@ import {
   secondarySeasonEnded,
 } from './goidanichCycle'
 import { goidanichSecondaryRisk } from './goidanichRisk'
-import { makeDay } from './testUtils'
+import { makeDay } from '../test/testUtils'
 import { addDaysUTC } from './weatherMath'
 
 const START = '2026-06-01'

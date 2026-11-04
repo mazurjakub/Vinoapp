@@ -1,9 +1,4 @@
 {
-  "_meta": {
-    "file": "cs.json",
-    "created": "2026-10-25",
-    "description": "Czech interface texts."
-  },
   "nav": {
     "overview": "Přehled",
     "weather": "Počasí",
@@ -17,7 +12,6 @@
   },
   "overview": {
     "title": "Přehled",
-    "addVineyardPrompt": "Nejdřív přidejte parcelu na stránce {{settingsLink}}.",
     "carePlanLink": "Plán péče podle růstové fáze →"
   },
   "weather": {
@@ -48,12 +42,10 @@
     "temp": "Průměrná teplota",
     "precip": "Srážky za den",
     "rh": "Průměrná vlhkost",
-    "indices": "Goidanich a Gubler-Thomas",
     "today": "dnes",
     "goidanich": "Goidanich (inkubace sekundární infekce, orientační)",
     "gubler": "Gubler-Thomas (padlí, orientační, model z Kalifornie)",
     "primaryEvent": "Primární infekce plísně",
-    "forecast": "Předpověď (zatím neověřeno archivem)",
     "panelPrecipTemp": "Srážky a teplota",
     "forecastBandLabel": "předpověď",
     "legend": {
@@ -84,7 +76,6 @@
       "ended": "Inkubace skončila {{date}}, zkontrolujte listy na olejové skvrny.",
       "seasonOver": "Mimo vegetaci, index se nepočítá."
     },
-    "riskLabel": "Riziko",
     "notActive": "zatím neaktivní",
     "daySummaryHint": "Najeďte myší nebo klikněte na graf pro detail dne.",
     "tableTitle": "Tabulka hodnot",
@@ -116,7 +107,6 @@
   },
   "journal": {
     "title": "Deník",
-    "placeholder": "Chronologický seznam postřiků a prací se objeví zde.",
     "noVineyardPrompt": "Postřiky a práce se zapisují ke konkrétní parcele. Přidejte a vyberte ji na stránce Přehled.",
     "sprays": {
       "title": "Postřiky",
@@ -226,7 +216,6 @@
     }
   },
   "vineyard": {
-    "listTitle": "Parcely",
     "addVineyard": "Přidat parcelu",
     "showAll": "Zobrazit všechny parcely ({{count}})",
     "hideOthers": "Skrýt ostatní parcely",
@@ -238,7 +227,6 @@
     "deleteConfirm": "Opravdu chcete smazat parcelu? Smažou se i všechny záznamy postřiků, prací, úrody a růstových fází pro ni.",
     "growthStage": "Růstová fáze",
     "hideGrowthStage": "Skrýt růstovou fázi",
-    "empty": "Zatím nemáte žádnou parcelu.",
     "plantedIn": "Vysazeno {{year}}",
     "form": {
       "name": "Název parcely",

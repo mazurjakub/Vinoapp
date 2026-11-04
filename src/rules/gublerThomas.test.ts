@@ -14,7 +14,7 @@ import {
   resolveGublerStart,
   type GublerThomasState,
 } from './gublerThomas'
-import { makeDay } from './testUtils'
+import { makeDay } from '../test/testUtils'
 import type { HourlyWeather } from '../db/schema'
 
 function qualifyingDay(date: string): HourlyWeather[] {

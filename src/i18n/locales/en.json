@@ -1,9 +1,4 @@
 {
-  "_meta": {
-    "file": "en.json",
-    "created": "2026-10-25",
-    "description": "English interface texts, matching the Czech wording."
-  },
   "nav": {
     "overview": "Overview",
     "weather": "Weather",
@@ -17,7 +12,6 @@
   },
   "overview": {
     "title": "Overview",
-    "addVineyardPrompt": "First add a plot on the {{settingsLink}} page.",
     "carePlanLink": "Care plan by growth stage →"
   },
   "weather": {
@@ -48,12 +42,10 @@
     "temp": "Mean temperature",
     "precip": "Daily precipitation",
     "rh": "Mean humidity",
-    "indices": "Goidanich and Gubler-Thomas",
     "today": "today",
     "goidanich": "Goidanich (secondary infection incubation, indicative)",
     "gubler": "Gubler-Thomas (powdery mildew, indicative, Californian model)",
     "primaryEvent": "Primary downy mildew infection",
-    "forecast": "Forecast (not yet verified by the archive)",
     "panelPrecipTemp": "Precipitation and temperature",
     "forecastBandLabel": "forecast",
     "legend": {
@@ -84,7 +76,6 @@
       "ended": "Incubation ended on {{date}}, check the leaves for oil spots.",
       "seasonOver": "Outside the growing season, the index is not calculated."
     },
-    "riskLabel": "Risk",
     "notActive": "not active yet",
     "daySummaryHint": "Hover over or click the chart for a day's detail.",
     "tableTitle": "Table of values",
@@ -116,7 +107,6 @@
   },
   "journal": {
     "title": "Journal",
-    "placeholder": "A chronological list of sprays and work will appear here.",
     "noVineyardPrompt": "Sprays and work are recorded for a specific plot. Add and select one on the Overview page.",
     "sprays": {
       "title": "Sprays",
@@ -226,7 +216,6 @@
     }
   },
   "vineyard": {
-    "listTitle": "Plots",
     "addVineyard": "Add plot",
     "showAll": "Show all plots ({{count}})",
     "hideOthers": "Hide other plots",
@@ -238,7 +227,6 @@
     "deleteConfirm": "Do you really want to delete this plot? All its spray, work, harvest and growth stage records will be deleted too.",
     "growthStage": "Growth stage",
     "hideGrowthStage": "Hide growth stage",
-    "empty": "You don't have any plots yet.",
     "plantedIn": "Planted {{year}}",
     "form": {
       "name": "Plot name",

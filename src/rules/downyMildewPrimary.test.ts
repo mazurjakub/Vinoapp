@@ -7,7 +7,7 @@
 import { describe, expect, it } from 'vitest'
 import { countPrimaryInfectionEvents, downyMildewPrimaryRisk } from './downyMildewPrimary'
 import { REGION_PROFILES } from './regionProfiles'
-import { makeDay } from './testUtils'
+import { makeDay } from '../test/testUtils'
 import type { HourlyWeather } from '../db/schema'
 import type { RiskResult } from './types'
 

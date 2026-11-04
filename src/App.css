@@ -117,14 +117,8 @@ button {
 
 .vineyard-card,
 .growth-stage-editor,
-.general-settings {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 16px;
-}
-
+.general-settings,
+.risk-block,
 .vineyard-card {
   cursor: pointer;
   border: 2px solid var(--border);
@@ -263,20 +257,12 @@ button {
 }
 
 .weather-table tr.current-hour {
-  background: var(--accent-bg, rgba(91, 42, 74, 0.15));
+  background: rgba(91, 42, 74, 0.15);
   font-weight: 600;
 }
 
 .risk-panel {
   margin-top: 20px;
-}
-
-.risk-block {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 16px;
 }
 
 .risk-block-header {
@@ -537,8 +523,7 @@ button {
   padding: 4px 10px;
 }
 
-/* Used by HarvestBarChart.tsx, despite the name. */
-.weather-chart-svg {
+.harvest-chart-svg {
   width: 100%;
   height: auto;
   display: block;
@@ -550,12 +535,7 @@ button {
   opacity: 0.8;
 }
 
-/* Weather chart (Recharts). Series colours are CSS vars passed as SVG
-   presentation-attribute values (e.g. stroke="var(--chart-temp)") directly on
-   the Recharts components, not via className — Recharts doesn't reliably put
-   a consumer className on the inner <path>/<rect> that actually needs the
-   colour, but presentation attributes do resolve var() and stay reactive to
-   the dark-mode media query. */
+/* Chart colours are passed to Recharts as stroke="var(--chart-...)", className doesn't reach the inner paths. */
 .weather-chart {
   margin: 16px 0;
   color: var(--text);
@@ -653,12 +633,6 @@ button {
   font-weight: 400;
 }
 
-@media (max-width: 480px) {
-  .chart-legend .chart-legend-wide-only {
-    display: none;
-  }
-}
-
 .table-toggle {
   margin-top: 16px;
 }
@@ -670,6 +644,10 @@ button {
 }
 
 @media (max-width: 480px) {
+  .chart-legend .chart-legend-wide-only {
+    display: none;
+  }
+
   .weather-table {
     font-size: 12px;
   }
@@ -681,40 +659,5 @@ button {
   .weather-table th,
   .weather-table td {
     padding: 8px 5px;
-  }
-}
-
-:root {
-  --chart-temp: #b45309;
-  --chart-precip: #1d4ed8;
-  --chart-goidanich: #6d28d9;
-  --chart-gubler: #9d174d;
-  --chart-event: #b91c1c;
-  --chart-today: #111827;
-  --chart-threshold: #6b7280;
-  --chart-muted: #6b7280;
-  --chart-forecast-bg: rgba(107, 114, 128, 0.14);
-  /* The Goidanich warning area; its edge and the end of incubation are labelled in the chart. */
-  --zone-alert: rgba(234, 120, 8, 0.18);
-  --chart-spray: #047857;
-  --chart-off-season: rgba(107, 114, 128, 0.32);
-  --chart-off-season-bg: rgba(107, 114, 128, 0.06);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --chart-temp: #fbbf24;
-    --chart-precip: #60a5fa;
-    --chart-goidanich: #c4b5fd;
-    --chart-gubler: #f9a8d4;
-    --chart-event: #f87171;
-    --chart-today: #f5f5f5;
-    --chart-threshold: #9ca3af;
-    --chart-muted: #9ca3af;
-    --chart-forecast-bg: rgba(156, 163, 175, 0.18);
-    --zone-alert: rgba(251, 146, 60, 0.24);
-    --chart-spray: #34d399;
-    --chart-off-season: rgba(156, 163, 175, 0.34);
-    --chart-off-season-bg: rgba(156, 163, 175, 0.06);
   }
 }

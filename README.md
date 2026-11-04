@@ -12,12 +12,13 @@ Vite, React, TypeScript, Dexie (IndexedDB), i18next, Recharts, vite-plugin-pwa, 
 
 ## Struktura projektu
 
-- `src/rules`: pravidlový engine (výpočty rizika bez vazby na UI), tabulka v `src/goidanich.json`
+- `src/rules`: pravidlový engine (výpočty rizika bez vazby na UI)
+- `src/data`: tabulka Goidanich a plán péče (JSON)
 - `src/features`, `src/routes`: funkce aplikace a stránky
 - `src/db`: databáze a migrace
 - `src/weather`: stahování počasí z Open-Meteo
 - `src/i18n/locales`: překlady (`cs.json`, `en.json`)
-- Testy: `*.test.ts` a `*.test.tsx` vedle testovaného kódu, smoke testy stránek v `src/routes/smoke.test.tsx`, nastavení testů v `src/test`
+- Testy: `*.test.ts` a `*.test.tsx` vedle testovaného kódu, smoke testy stránek v `src/routes/smoke.test.tsx`, nastavení a pomocné funkce testů v `src/test`
 
 ## Vývoj
 
