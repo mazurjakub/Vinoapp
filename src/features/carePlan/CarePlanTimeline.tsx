@@ -49,11 +49,6 @@ function CarePlanTimeline({ vineyardId }: CarePlanTimelineProps) {
 
   return (
     <div className="care-plan">
-      <p className="risk-sync-warning">{t('carePlanData.disclaimer')}</p>
-      <p className="growth-stage-hint">
-        {t('carePlan.source')} {t('carePlanData.source')} {t('carePlanData.note')}
-      </p>
-
       <p>
         {phase === 'none'
           ? t('carePlan.noPhase')
@@ -75,7 +70,6 @@ function CarePlanTimeline({ vineyardId }: CarePlanTimelineProps) {
                     <strong>
                       {CODE_SYMBOLS[stage.code]} {t(`carePlanData.stages.${stage.labelKey}`)}
                     </strong>
-                    <span>{t('carePlan.bbch', { from: stage.bbchFrom, to: stage.bbchTo })}</span>
                   </div>
                   <p className="journal-entry-notes">
                     {t('carePlan.targets')} {stage.targets.map(targetLabel).join(', ')}
@@ -96,10 +90,6 @@ function CarePlanTimeline({ vineyardId }: CarePlanTimelineProps) {
                         {i18n.exists(`${textKey}.note`) && (
                           <p className="journal-entry-notes">{t(`${textKey}.note`)}</p>
                         )}
-                        <p className="journal-entry-notes">
-                          {t('carePlan.inspectionSource')}{' '}
-                          {t('carePlanData.inspectionSource', { pages: inspection.sourcePages })}
-                        </p>
                       </div>
                     )
                   })}

@@ -12,15 +12,13 @@ import {
   type GoidanichCycleState,
   type GoidanichCycleStatus,
 } from './goidanichCycle'
-import { WARNING_THRESHOLD_PCT } from './goidanichStateMachine'
+import { GOIDANICH_TABLE_MIN_TEMP_C } from './goidanichDailyDevelopment'
 import type { RiskReason, RiskResult } from './types'
 import { groupByDay } from './weatherMath'
 
 const SOURCE =
   'Goidanich table and algorithm from Pérez-Expósito et al. (2017), VineSens. ' +
   'Unverified model; the table transcription contains uncertain cells.'
-
-const MIN_DEVELOPMENT_TEMP_C = 12
 
 export interface GoidanichDayResult extends RiskResult {
   cycleStatus: GoidanichCycleStatus
@@ -62,8 +60,8 @@ export function goidanichSecondaryRisk(
 
     const nearEnd =
       state.status === 'running' &&
-      state.accumulatedPct >= WARNING_THRESHOLD_PCT &&
-      step.meanTempC > MIN_DEVELOPMENT_TEMP_C
+      state.accumulatedPct >= options.thresholds.warning &&
+      step.meanTempC >= GOIDANICH_TABLE_MIN_TEMP_C
     const newInfection = options.newInfectionDates?.has(day.date) ?? false
 
     results.push({
@@ -71,7 +69,7 @@ export function goidanichSecondaryRisk(
       risk: nearEnd || newInfection ? 'high' : 'low',
       reasons: [
         statusReason(state),
-        ...(nearEnd ? [{ key: 'riskReasons.goidanichNearEnd', params: { threshold: WARNING_THRESHOLD_PCT } }] : []),
+        ...(nearEnd ? [{ key: 'riskReasons.goidanichNearEnd', params: { threshold: options.thresholds.warning } }] : []),
         ...(newInfection ? [{ key: 'riskReasons.goidanichNewInfection' }] : []),
         ...(state.status === 'running' && step.stepReason ? [step.stepReason] : []),
       ],

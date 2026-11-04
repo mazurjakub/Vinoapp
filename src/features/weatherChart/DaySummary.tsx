@@ -5,13 +5,13 @@
  */
 
 import { formatNumber, formatWithUnit } from '../../i18n/formatNumber'
-import type { GoidanichDayStatus, Risk } from '../../rules'
+import { GOIDANICH_TABLE_MIN_TEMP_C, type GoidanichDayStatus, type Risk } from '../../rules'
 import { isForecastDate } from './chartLayout'
 import { RISK_LABEL_KEYS } from '../risk/riskLabels'
 import type { WeatherPoint } from './weatherSeries'
 
 interface DaySummaryProps {
-  row: WeatherPoint | undefined
+  row: (WeatherPoint & { goidanichIncrementPct: number | null; goidanichCold: boolean }) | undefined
   today: string
   t: (key: string, options?: Record<string, unknown>) => string
   dateLabel: (date: string) => string
@@ -74,6 +74,14 @@ function DaySummary({ row, today, t, dateLabel, locale, goidanichStatus, gublerR
         <strong>{t('weatherChart.columns.goidanich')}:</strong>{' '}
         {row.goidanichPct === null ? goidanichStatusText() : formatWithUnit(row.goidanichPct, '%', locale, 0)}
       </span>
+      {row.goidanichIncrementPct !== null && (
+        <span className="chart-day-summary-item">
+          <strong>{t('weatherChart.increment')}:</strong>{' '}
+          {row.goidanichCold
+            ? t('weatherChart.incrementCold', { temperature: GOIDANICH_TABLE_MIN_TEMP_C })
+            : `+${formatWithUnit(row.goidanichIncrementPct, '%', locale, 1)}`}
+        </span>
+      )}
       <span className="chart-day-summary-item">
         <strong>{t('weatherChart.columns.gubler')}:</strong>{' '}
         {row.gublerScore === null

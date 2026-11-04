@@ -6,6 +6,7 @@
 
 import { createInstance } from 'i18next'
 import { describe, expect, it } from 'vitest'
+import { DEFAULT_GOIDANICH_THRESHOLDS } from '../../rules'
 import cs from '../../i18n/locales/cs.json'
 import en from '../../i18n/locales/en.json'
 import {
@@ -43,16 +44,16 @@ const reasons: RiskReason[] = [
   ...powderyMildewGublerThomasRisk([...hotDay, ...coldDay]).flatMap((r) => r.reasons),
   ...goidanichSecondaryRisk(warmDays, '2026-06-01', undefined, {
     primaryEventDates: new Set(['2026-06-01']),
-    stallDays: 21,
+    stallDays: 21, thresholds: DEFAULT_GOIDANICH_THRESHOLDS,
     newInfectionDates: new Set(['2026-06-02']),
   }).flatMap((r) => r.reasons),
   ...goidanichSecondaryRisk(coldDays, '2026-09-01', undefined, {
     primaryEventDates: new Set(['2026-09-01']),
-    stallDays: 2,
+    stallDays: 2, thresholds: DEFAULT_GOIDANICH_THRESHOLDS,
   }).flatMap((r) => r.reasons),
   ...goidanichSecondaryRisk(coldDays, '2026-09-01', undefined, {
     primaryEventDates: new Set(),
-    stallDays: 2,
+    stallDays: 2, thresholds: DEFAULT_GOIDANICH_THRESHOLDS,
   }).flatMap((r) => r.reasons),
 ]
 

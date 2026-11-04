@@ -1,14 +1,15 @@
 {
   "_meta": {"file":"goidanich.json","created":"2026-10-02","description":"Goidanich table of daily infection development by temperature and humidity, transcribed from the source paper."},
   "_source": "Perez-Exposito et al. (2017), VineSens, Sensors 17(3), 465, Table 1 (Goidanich table). Transcribed by hand from a screenshot supplied by the project author.",
-  "_verified": false,
-  "_howToVerify": "Compare every value with Table 1 in https://www.mdpi.com/1424-8220/17/3/465 before use. Add a unit test that asserts the checksums below.",
+  "_verified": "2026-11-04",
+  "_howToVerify": "Verified on 2026-11-04: all 53 cells compared by script with Table 1 in the open-access full text (Europe PMC, PMC5375751, the same article as https://www.mdpi.com/1424-8220/17/3/465). No differences.",
   "_notes": [
     "dailyDevelopmentPct is the percentage of infection development added for one day.",
     "The paper states that from 25 C the development is constant. The screenshot shows only the first sub-row for 25 C.",
-    "accumulatedPct (0, 25, 50, 75) is an unlabeled sub-column in the screenshot. It is most likely the share of development already accumulated, but this is NOT confirmed. Verify in the paper.",
-    "Suspicious cells (possible typos in the source or in the transcription): 12 C / 0 / rhLt75 = 0 (neighbours are about 4.4); 16 C / 50 / rhLt75 = 6.3 (neighbours 9 and 9.6, probably 9.3); 18 C / 25 / rhGe75 = 15.2 (lower than 15.3 at 0).",
-    "RH threshold is 75 percent. It is not stated whether daily mean RH or hours of RH is meant. Verify in the paper."
+    "accumulatedPct (0, 25, 50, 75) is an unlabeled sub-column in the original table too, and the paper does not explain it. Reading it as the share of development already accumulated is our assumption.",
+    "Suspicious cells, all three exactly as in the published table (not transcription errors, possibly typos in the paper; kept as published): 12 C / 0 / rhLt75 = 0 (neighbours are about 4.4); 16 C / 50 / rhLt75 = 6.3 (neighbours 9 and 9.6, probably 9.3); 18 C / 25 / rhGe75 = 15.2 (lower than 15.3 at 0).",
+    "RH threshold is 75 percent. The paper does not state whether daily mean RH or hours of RH is meant.",
+    "Lowest temperature: the paper's diagram says \"> 12 C\", but the table starts with a row for 12 C. The app follows the table: a daily mean of 12.0 C uses row 12, and only a mean below 12 C adds nothing. The text of the paper does not mention the 12 C bound; it is only in the diagram (Figure 1)."
   ],
   "constantFromTempC": 25,
   "rhThresholdPct": 75,

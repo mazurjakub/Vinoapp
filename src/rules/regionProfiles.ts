@@ -38,7 +38,27 @@ export interface SecondaryInfectionProfile {
    * it comes from an ambiguous diagram and isn't verified.
    */
   requireWetHours: boolean
+  /** Goidanich thresholds in %. The engine, the chart, its sentence, the Overview and the alerts all read these. */
+  thresholdsPct: GoidanichThresholds
+  /** Where the thresholds come from. */
+  thresholdsSource: string
+  /** When the thresholds were last checked against the source (YYYY-MM-DD); `null` = not checked yet. */
+  thresholdsVerifiedOn: string | null
 }
+
+export interface GoidanichThresholds {
+  /** Warning: the cycle is near its end. */
+  warning: number
+  /** End of incubation: the cycle closes. */
+  urgent: number
+}
+
+/**
+ * Default values of the profiles. The paper also names a more cautious 80%
+ * warning; it isn't used.
+ */
+export const DEFAULT_GOIDANICH_THRESHOLDS: GoidanichThresholds = { warning: 90, urgent: 100 }
+const GOIDANICH_THRESHOLDS_SOURCE = 'Pérez-Expósito et al. (2017), VineSens, Sensors 17(3), 465: alerts at 90% (default) and 100%.'
 
 export interface RegionProfile {
   id: RegionProfileId
@@ -62,7 +82,14 @@ export const REGION_PROFILES: Record<RegionProfileId, RegionProfile> = {
       oosporeDegreeSumThresholdDs: 170,
       tracksInfectionEvents: true,
     },
-    secondaryInfection: { stallDays: 21, seasonEndMonthDay: '10-31', requireWetHours: false },
+    secondaryInfection: {
+      stallDays: 21,
+      seasonEndMonthDay: '10-31',
+      requireWetHours: false,
+      thresholdsPct: DEFAULT_GOIDANICH_THRESHOLDS,
+      thresholdsSource: GOIDANICH_THRESHOLDS_SOURCE,
+      thresholdsVerifiedOn: '2026-11-04',
+    },
     powderyMildew: { hotDayVariant: 'original' },
     // TODO: confirm the exact start date of the SET8,0 sum.
     source: 'Situation reports for the Moravian wine region (2009, 2012, 2025).',
@@ -79,7 +106,14 @@ export const REGION_PROFILES: Record<RegionProfileId, RegionProfile> = {
       oosporeDegreeSumThresholdDs: 170,
       tracksInfectionEvents: false,
     },
-    secondaryInfection: { stallDays: 21, seasonEndMonthDay: '10-31', requireWetHours: false },
+    secondaryInfection: {
+      stallDays: 21,
+      seasonEndMonthDay: '10-31',
+      requireWetHours: false,
+      thresholdsPct: DEFAULT_GOIDANICH_THRESHOLDS,
+      thresholdsSource: GOIDANICH_THRESHOLDS_SOURCE,
+      thresholdsVerifiedOn: '2026-11-04',
+    },
     powderyMildew: { hotDayVariant: 'original' },
     source: 'IWC Insight (2019), 3-10 model. Unverified for any specific region.',
     verified: 'generic',

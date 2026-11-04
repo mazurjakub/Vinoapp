@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { goidanichDailyDevelopment } from './goidanichDailyDevelopment'
+import { GOIDANICH_TABLE_MIN_TEMP_C, goidanichDailyDevelopment, goidanichTableRowTempC } from './goidanichDailyDevelopment'
 import goidanichTable from '../goidanich.json'
 
 describe('goidanichDailyDevelopment - direct table lookups', () => {
@@ -51,6 +51,38 @@ describe('goidanichDailyDevelopment - rounding choices (this app\'s own, not fro
     expect(goidanichDailyDevelopment(13, 50, 49.9)).toBe(goidanichDailyDevelopment(13, 50, 25))
     expect(goidanichDailyDevelopment(13, 50, 50)).toBe(6)
     expect(goidanichDailyDevelopment(13, 50, 90)).toBe(goidanichDailyDevelopment(13, 50, 75)) // clamped to last stage
+  })
+})
+
+describe('goidanichTableRowTempC - which row a daily mean uses', () => {
+  it('takes the lower edge from the table', () => {
+    expect(GOIDANICH_TABLE_MIN_TEMP_C).toBe(Math.min(...goidanichTable.rows.map((r) => r.tempC)))
+    expect(GOIDANICH_TABLE_MIN_TEMP_C).toBe(12)
+  })
+
+  it.each([
+    [11.9, null],
+    [12.0, 12],
+    [12.4, 12],
+    [12.5, 13],
+    [24.9, 24],
+    [25.0, 25],
+    [30, 25],
+  ])('maps %s °C to row %s', (meanTempC, row) => {
+    expect(goidanichTableRowTempC(meanTempC)).toBe(row)
+  })
+
+  // Stage 25 and humidity below 75%, so the flagged 12 °C / 0 cell doesn't hide the edge.
+  it.each([
+    [11.9, 0],
+    [12.0, 4.4],
+    [12.4, 4.4],
+    [12.5, 5.7],
+    [24.9, 17.7],
+    [25.0, 16.6],
+    [30, 16.6],
+  ])('adds the right value at %s °C', (meanTempC, expected) => {
+    expect(goidanichDailyDevelopment(meanTempC, 50, 25)).toBe(expected)
   })
 })
 

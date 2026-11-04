@@ -5,6 +5,7 @@
  */
 
 import { describe, expect, it } from 'vitest'
+import { DEFAULT_GOIDANICH_THRESHOLDS } from '../../rules'
 import type { HourlyWeather } from '../../db/schema'
 import {
   addDaysUTC,
@@ -39,7 +40,7 @@ function day(i: number): DayHours[] {
 }
 
 const ALL_DAYS = Array.from({ length: 30 }, (_, i) => day(i)).flat()
-const CYCLE_OPTIONS = { primaryEventDates: new Set([START]), stallDays: 21 }
+const CYCLE_OPTIONS = { primaryEventDates: new Set([START]), stallDays: 21, thresholds: DEFAULT_GOIDANICH_THRESHOLDS }
 const goidanichStep = makeGoidanichStep(CYCLE_OPTIONS)
 
 describe('projection equals continuous computation', () => {

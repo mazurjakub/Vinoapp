@@ -71,32 +71,35 @@ function Weather() {
         </Suspense>
       )}
       {upcoming.length > 0 && (
-        <div className="weather-table-wrap">
-          <table className="weather-table">
-            <thead>
-              <tr>
-                <th>{t('weather.columns.day')}</th>
-                <th>{t('weather.columns.hour')}</th>
-                <th>{t('weather.columns.temperature')}</th>
-                <th>{t('weather.columns.humidity')}</th>
-                <th>{t('weather.columns.dewPoint')}</th>
-                <th>{t('weather.columns.precipitation')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {upcoming.map((h) => (
-                <tr key={h.time} className={h.time.slice(0, 13) === nowKey ? 'current-hour' : ''}>
-                  <td>{formatDay(h.time, locale)}</td>
-                  <td>{formatHour(h.time)}</td>
-                  <td>{formatWithUnit(h.temperature2m, '°C', locale, 1)}</td>
-                  <td>{formatWithUnit(h.relativeHumidity2m, '%', locale, 0)}</td>
-                  <td>{formatWithUnit(h.dewPoint2m, '°C', locale, 1)}</td>
-                  <td>{formatWithUnit(h.precipitation, 'mm', locale, 1)}</td>
+        <details className="table-toggle">
+          <summary>{t('weather.hourlyTitle', { count: upcoming.length })}</summary>
+          <div className="weather-table-wrap">
+            <table className="weather-table">
+              <thead>
+                <tr>
+                  <th>{t('weather.columns.day')}</th>
+                  <th>{t('weather.columns.hour')}</th>
+                  <th>{t('weather.columns.temperature')}</th>
+                  <th>{t('weather.columns.humidity')}</th>
+                  <th>{t('weather.columns.dewPoint')}</th>
+                  <th>{t('weather.columns.precipitation')}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {upcoming.map((h) => (
+                  <tr key={h.time} className={h.time.slice(0, 13) === nowKey ? 'current-hour' : ''}>
+                    <td>{formatDay(h.time, locale)}</td>
+                    <td>{formatHour(h.time)}</td>
+                    <td>{formatWithUnit(h.temperature2m, '°C', locale, 1)}</td>
+                    <td>{formatWithUnit(h.relativeHumidity2m, '%', locale, 0)}</td>
+                    <td>{formatWithUnit(h.dewPoint2m, '°C', locale, 1)}</td>
+                    <td>{formatWithUnit(h.precipitation, 'mm', locale, 1)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
       )}
     </section>
   )

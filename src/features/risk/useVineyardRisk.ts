@@ -151,6 +151,7 @@ export function useVineyardRisk(vineyardId: number | undefined) {
             {
               primaryEventDates: new Set(seasonPrimaryEvents?.map((e) => e.date)),
               stallDays: profile.secondaryInfection.stallDays,
+              thresholds: profile.secondaryInfection.thresholdsPct,
               requireWetHours: profile.secondaryInfection.requireWetHours,
               newInfectionDates: new Set(primary.filter((r) => r.risk === 'high').map((r) => r.date)),
             },

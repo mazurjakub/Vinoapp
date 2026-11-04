@@ -5,6 +5,7 @@
  */
 
 import { describe, expect, it } from 'vitest'
+import { DEFAULT_GOIDANICH_THRESHOLDS } from './regionProfiles'
 import {
   goidanichDayStatus,
   goidanichDisplayPct,
@@ -24,13 +25,13 @@ function days(count: number, temperature2m: number, relativeHumidity2m = 90, off
   ).flat()
 }
 
-const options = { primaryEventDates: new Set([START]), stallDays: 5 }
+const options = { primaryEventDates: new Set([START]), stallDays: 5, thresholds: DEFAULT_GOIDANICH_THRESHOLDS }
 
 describe('goidanichSecondaryRisk', () => {
   it('only includes days from fromDate onward and starts at low risk', () => {
     const results = goidanichSecondaryRisk(days(2, 20, 50), addDaysUTC(START, 1), undefined, {
       primaryEventDates: new Set([addDaysUTC(START, 1)]),
-      stallDays: 5,
+      stallDays: 5, thresholds: DEFAULT_GOIDANICH_THRESHOLDS,
     })
     expect(results).toHaveLength(1)
     expect(results[0].risk).toBe('low')
@@ -58,9 +59,9 @@ describe('goidanichSecondaryRisk', () => {
     }
     const warm = goidanichSecondaryRisk(days(1, 13, 50), START, { ...state, accumulatedPct: 91 }, {
       primaryEventDates: new Set(),
-      stallDays: 5,
+      stallDays: 5, thresholds: DEFAULT_GOIDANICH_THRESHOLDS,
     })
-    const cold = goidanichSecondaryRisk(days(1, 5), START, state, { primaryEventDates: new Set(), stallDays: 5 })
+    const cold = goidanichSecondaryRisk(days(1, 5), START, state, { primaryEventDates: new Set(), stallDays: 5, thresholds: DEFAULT_GOIDANICH_THRESHOLDS })
     expect(warm[0].risk).toBe('high')
     expect(cold[0].risk).toBe('low')
     expect(cold[0].reasons[0].params?.pct).toBe('95')
@@ -77,7 +78,7 @@ describe('goidanichSecondaryRisk', () => {
     const newEvent = addDaysUTC(START, 8)
     const results = goidanichSecondaryRisk(days(10, 5), START, undefined, {
       primaryEventDates: new Set([START, newEvent]),
-      stallDays: 5,
+      stallDays: 5, thresholds: DEFAULT_GOIDANICH_THRESHOLDS,
     })
     const atEvent = results.find((r) => r.date === newEvent)
     expect(atEvent?.cycleStatus).toBe('running')
@@ -88,7 +89,7 @@ describe('goidanichSecondaryRisk', () => {
     const second = addDaysUTC(START, 1)
     const results = goidanichSecondaryRisk(days(3, 20, 50), START, undefined, {
       primaryEventDates: new Set([START, second]),
-      stallDays: 5,
+      stallDays: 5, thresholds: DEFAULT_GOIDANICH_THRESHOLDS,
     })
     expect(results[2].reasons[0].dates?.start).toBe(START)
   })
@@ -96,7 +97,7 @@ describe('goidanichSecondaryRisk', () => {
   it('reports high risk on a day with a possible new infection, even without a running cycle', () => {
     const results = goidanichSecondaryRisk(days(1, 5), START, undefined, {
       primaryEventDates: new Set(),
-      stallDays: 5,
+      stallDays: 5, thresholds: DEFAULT_GOIDANICH_THRESHOLDS,
       newInfectionDates: new Set([START]),
     })
     expect(results[0].cycleStatus).toBe('none')
@@ -137,7 +138,7 @@ describe('goidanichSecondaryRisk - stagnation', () => {
     accumulatedPct: 95,
     alertLevel: 'warning' as const,
   }
-  const noEvents = { primaryEventDates: new Set<string>(), stallDays: 21 }
+  const noEvents = { primaryEventDates: new Set<string>(), stallDays: 21, thresholds: DEFAULT_GOIDANICH_THRESHOLDS }
 
   it('closes a cycle stuck at 95% after 21 days without growth', () => {
     const results = goidanichSecondaryRisk(days(22, 5), START, at95, noEvents)

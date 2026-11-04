@@ -9,12 +9,14 @@ import {
   advanceGoidanichState,
   initialGoidanichState,
   resetGoidanichState,
-  URGENT_THRESHOLD_PCT,
-  WARNING_THRESHOLD_PCT,
   type GoidanichState,
 } from './goidanichStateMachine'
+import { DEFAULT_GOIDANICH_THRESHOLDS } from './regionProfiles'
 
-const baseInput = { meanTempC: 20, rhPct: 90, wetTwoConsecutiveHours: false }
+const WARNING_THRESHOLD_PCT = DEFAULT_GOIDANICH_THRESHOLDS.warning
+const URGENT_THRESHOLD_PCT = DEFAULT_GOIDANICH_THRESHOLDS.urgent
+
+const baseInput = { meanTempC: 20, rhPct: 90, wetTwoConsecutiveHours: false, thresholds: DEFAULT_GOIDANICH_THRESHOLDS }
 
 describe('advanceGoidanichState', () => {
   it('adds development on a day above 12 °C, without any rain or hourly humidity input', () => {
@@ -23,13 +25,27 @@ describe('advanceGoidanichState', () => {
     expect(result.state.accumulatedPct).toBe(result.developmentAddedPct)
   })
 
-  it('names the mean temperature as the reason at or below 12 °C', () => {
-    const result = advanceGoidanichState(initialGoidanichState(), { ...baseInput, meanTempC: 12 })
+  it('names the mean temperature as the reason below 12 °C', () => {
+    const result = advanceGoidanichState(initialGoidanichState(), { ...baseInput, meanTempC: 11.9 })
     expect(result.developmentAddedPct).toBe(0)
     expect(result.reason).toEqual({
       key: 'riskReasons.goidanichTooCold',
-      params: { temperature: '12.0', min: 12 },
+      params: { temperature: '11.9', min: 12 },
     })
+  })
+
+  it('uses the table row for exactly 12.0 °C instead of treating it as cold', () => {
+    // Row 12, stage 0, humidity from 75%: 5.25.
+    const result = advanceGoidanichState(initialGoidanichState(), { ...baseInput, meanTempC: 12 })
+    expect(result.developmentAddedPct).toBe(5.25)
+    expect(result.reason.key).toBe('riskReasons.goidanichDevelopment')
+  })
+
+  it('reaches the alert levels at the profile thresholds it is given', () => {
+    const thresholds = { warning: 50, urgent: 60 }
+    const result = advanceGoidanichState({ accumulatedPct: 45, alertLevel: 'none' }, { ...baseInput, thresholds })
+    expect(result.state.accumulatedPct).toBeGreaterThanOrEqual(50)
+    expect(result.triggeredAlert).not.toBeNull()
   })
 
   it('uses humidity only to select the table column', () => {

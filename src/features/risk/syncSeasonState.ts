@@ -328,6 +328,7 @@ async function runSeasonSync(
         step: makeGoidanichStep({
           primaryEventDates: new Set(seasonPrimaryEvents.map((e) => e.date)),
           stallDays: profile.secondaryInfection.stallDays,
+          thresholds: profile.secondaryInfection.thresholdsPct,
           requireWetHours: profile.secondaryInfection.requireWetHours,
         }),
         onDay: (day, state) => pctByDate.set(day.date, goidanichDisplayPct(state, day.date)),

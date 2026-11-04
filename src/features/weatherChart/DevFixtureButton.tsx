@@ -6,7 +6,9 @@
 
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { deleteWeatherChartDevFixture, seedWeatherChartDevFixture } from './devFixture'
+import { deleteWeatherChartDevFixture, seedWeatherChartDevFixture, type DevFixtureVariant } from './devFixture'
+
+const VARIANTS: DevFixtureVariant[] = ['active', 'cold', 'offSeason']
 
 /**
  * Dev-only control: seeds (or removes) a synthetic spring/summer season into
@@ -19,22 +21,25 @@ import { deleteWeatherChartDevFixture, seedWeatherChartDevFixture } from './devF
  */
 function DevFixtureButton() {
   const { t } = useTranslation()
-  const [busy, setBusy] = useState<'seed' | 'delete' | null>(null)
+  const [busy, setBusy] = useState<DevFixtureVariant | 'delete' | null>(null)
   if (!import.meta.env.DEV) return null
 
   return (
     <div className="dev-fixture-panel">
       <span className="dev-fixture-label">DEV</span>
-      <button
-        type="button"
-        disabled={busy !== null}
-        onClick={() => {
-          setBusy('seed')
-          void seedWeatherChartDevFixture().finally(() => setBusy(null))
-        }}
-      >
-        {busy === 'seed' ? '…' : t('weatherChart.dev.seed')}
-      </button>
+      {VARIANTS.map((variant) => (
+        <button
+          key={variant}
+          type="button"
+          disabled={busy !== null}
+          onClick={() => {
+            setBusy(variant)
+            void seedWeatherChartDevFixture(variant).finally(() => setBusy(null))
+          }}
+        >
+          {busy === variant ? '…' : t(`weatherChart.dev.${variant}`)}
+        </button>
+      ))}
       <button
         type="button"
         disabled={busy !== null}

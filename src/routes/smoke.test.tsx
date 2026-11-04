@@ -26,6 +26,9 @@ const PAGES = [
 ]
 
 const PLOT_NAME = 'Testovací parcela'
+// Mid-season, so the test does not depend on the real date: after the season end
+// (31. 10.) the Goidanich panel has no values and draws no event marker.
+vi.useFakeTimers({ toFake: ['Date'], now: new Date('2026-07-15T12:00:00') })
 const today = localDateKey(new Date())
 
 /** Gives the charts a size, which jsdom doesn't have, so they really draw. */

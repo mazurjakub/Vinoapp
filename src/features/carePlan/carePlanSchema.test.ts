@@ -25,10 +25,8 @@ describe('carePlan.cz-bio.json', () => {
     expect(plan.stages.filter((s) => s.code === '2')).toHaveLength(3)
   })
 
-  it('carries the 2008 metadata and a disclaimer in both languages', () => {
+  it('carries the 2008 metadata', () => {
     expect(plan.dataYear).toBe(2008)
-    expect(cs.carePlanData.disclaimer).toMatch(/2008/)
-    expect(en.carePlanData.disclaimer).toMatch(/2008/)
   })
 
   it.each([

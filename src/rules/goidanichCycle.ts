@@ -4,14 +4,15 @@
  * Description: Tracks one Goidanich incubation cycle from its infection event to its end.
  */
 
-import { advanceGoidanichState, initialGoidanichState, URGENT_THRESHOLD_PCT, type GoidanichState } from './goidanichStateMachine'
+import { advanceGoidanichState, initialGoidanichState, type GoidanichState } from './goidanichStateMachine'
+import type { GoidanichThresholds } from './regionProfiles'
 import type { RiskReason } from './types'
 import { addDaysUTC, dailyMeanHumidity, dailyMeanTemperature, daysBetween, hasConsecutiveWetHours, type DayHours } from './weatherMath'
 
 export type GoidanichCycleStatus = 'none' | 'running' | 'complete' | 'stalled'
 
 /** Bump when the calculation changes: a stored state from another version is replayed by the next sync. */
-export const GOIDANICH_ENGINE_VERSION = 3
+export const GOIDANICH_ENGINE_VERSION = 4
 
 /** A day with fewer valid hours adds nothing, because its mean could miss the night or the afternoon. */
 export const GOIDANICH_MIN_HOURS_PER_DAY = 18
@@ -30,6 +31,8 @@ export interface GoidanichCycleOptions {
   primaryEventDates: ReadonlySet<string>
   stallDays: number
   requireWetHours?: boolean
+  /** From the plot's region profile. */
+  thresholds: GoidanichThresholds
 }
 
 export function initialGoidanichCycleState(): GoidanichCycleState {
@@ -84,13 +87,14 @@ export function advanceGoidanichCycle(
     wetTwoConsecutiveHours: hasConsecutiveWetHours(day.hours, 60, 2),
     requireWetHours: options.requireWetHours,
     incompleteDay: day.hours.length < GOIDANICH_MIN_HOURS_PER_DAY,
+    thresholds: options.thresholds,
   })
   const lastGrowthDate = step.developmentAddedPct > 0 ? day.date : current.lastGrowthDate
   // Counted from dates, so days missing from the data still count as stagnation.
   const daysWithoutGrowth = daysBetween(lastGrowthDate ?? addDaysUTC(current.startDate ?? day.date, -1), day.date)
 
   let status: GoidanichCycleStatus = 'running'
-  if (step.state.accumulatedPct >= URGENT_THRESHOLD_PCT) status = 'complete'
+  if (step.state.accumulatedPct >= options.thresholds.urgent) status = 'complete'
   else if (daysWithoutGrowth >= options.stallDays) status = 'stalled'
 
   return {

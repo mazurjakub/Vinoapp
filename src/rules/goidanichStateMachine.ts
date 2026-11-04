@@ -4,7 +4,8 @@
  * Description: Adds one day of Goidanich development to the accumulated value and resolves its alert level.
  */
 
-import { goidanichDailyDevelopment } from './goidanichDailyDevelopment'
+import { GOIDANICH_TABLE_MIN_TEMP_C, goidanichDailyDevelopment } from './goidanichDailyDevelopment'
+import type { GoidanichThresholds } from './regionProfiles'
 import type { RiskReason } from './types'
 
 export type GoidanichAlertLevel = 'none' | 'warning' | 'urgent'
@@ -31,6 +32,8 @@ export interface GoidanichDayInput {
   requireWetHours?: boolean
   /** Too few hours for a reliable daily mean, so the day adds nothing. */
   incompleteDay?: boolean
+  /** From the plot's region profile. */
+  thresholds: GoidanichThresholds
 }
 
 export interface GoidanichStepResult {
@@ -40,21 +43,16 @@ export interface GoidanichStepResult {
   reason: RiskReason
 }
 
-const MIN_TEMP_C = 12
-export const WARNING_THRESHOLD_PCT = 90
-export const URGENT_THRESHOLD_PCT = 100
-/** The paper's more cautious alternative; not applied by default. */
-export const CAUTIOUS_THRESHOLD_PCT = 80
-
 const ALERT_ORDER: GoidanichAlertLevel[] = ['none', 'warning', 'urgent']
 
 function resolveAlert(
   currentLevel: GoidanichAlertLevel,
   accumulatedPct: number,
+  thresholds: GoidanichThresholds,
 ): { alertLevel: GoidanichAlertLevel; triggeredAlert: GoidanichAlertLevel | null } {
   let nextLevel: GoidanichAlertLevel = currentLevel
-  if (accumulatedPct >= URGENT_THRESHOLD_PCT) nextLevel = 'urgent'
-  else if (accumulatedPct >= WARNING_THRESHOLD_PCT) nextLevel = 'warning'
+  if (accumulatedPct >= thresholds.urgent) nextLevel = 'urgent'
+  else if (accumulatedPct >= thresholds.warning) nextLevel = 'warning'
 
   const triggeredAlert =
     ALERT_ORDER.indexOf(nextLevel) > ALERT_ORDER.indexOf(currentLevel) ? nextLevel : null
@@ -67,10 +65,11 @@ function noChange(state: GoidanichState, reason: RiskReason): GoidanichStepResul
 
 export function advanceGoidanichState(state: GoidanichState, input: GoidanichDayInput): GoidanichStepResult {
   if (input.incompleteDay) return noChange(state, { key: 'riskReasons.goidanichIncompleteDay' })
-  if (input.meanTempC <= MIN_TEMP_C) {
+  // The table has a row for 12 °C, so only a mean below it adds nothing.
+  if (input.meanTempC < GOIDANICH_TABLE_MIN_TEMP_C) {
     return noChange(state, {
       key: 'riskReasons.goidanichTooCold',
-      params: { temperature: input.meanTempC.toFixed(1), min: MIN_TEMP_C },
+      params: { temperature: input.meanTempC.toFixed(1), min: GOIDANICH_TABLE_MIN_TEMP_C },
     })
   }
   if (input.requireWetHours && !input.wetTwoConsecutiveHours) {
@@ -80,7 +79,7 @@ export function advanceGoidanichState(state: GoidanichState, input: GoidanichDay
   const developmentAddedPct = goidanichDailyDevelopment(input.meanTempC, input.rhPct, state.accumulatedPct)
   // Table values have two decimals. Summing them as floats could leave 95 + 5 just under a threshold.
   const accumulatedPct = Math.round((state.accumulatedPct + developmentAddedPct) * 100) / 100
-  const { alertLevel, triggeredAlert } = resolveAlert(state.alertLevel, accumulatedPct)
+  const { alertLevel, triggeredAlert } = resolveAlert(state.alertLevel, accumulatedPct, input.thresholds)
   return {
     state: { accumulatedPct, alertLevel },
     developmentAddedPct,

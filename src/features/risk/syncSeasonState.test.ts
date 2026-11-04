@@ -5,6 +5,7 @@
  */
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { DEFAULT_GOIDANICH_THRESHOLDS } from '../../rules'
 import { db } from '../../db'
 import { getSetting, setSetting } from '../../db/settingsRepo'
 import { buildWeatherSeries } from '../weatherChart/weatherSeries'
@@ -145,7 +146,8 @@ describe('syncVineyardSeasonState', () => {
       const vineyard = makeVineyard()
       const now = new Date().toISOString()
       await db.infectionEvents.add({ vineyardId: VINEYARD_ID, date: eventDay, disease: 'downy', type: 'primary', rule: 'manual-test', status: 'active' as const, createdAt: now, updatedAt: now })
-      const phenology = { budbreak: seasonStart }
+      // A harvest after today keeps the Goidanich season open, so the test doesn't depend on the date (season end 31 Oct).
+      const phenology = { budbreak: seasonStart, harvest: addDaysUTC(today, 30) }
 
       await syncVineyardSeasonState(vineyard, phenology, hourlyForDay(yesterday, 14), { fetchHistoricalHourly: serveAt(() => 14) })
 
@@ -161,7 +163,7 @@ describe('syncVineyardSeasonState', () => {
         const [day] = groupByDay(hourlyForDay(d, d >= windowStart ? 13 : 14))
         expected = advanceGoidanichCycle(expected, day, {
           primaryEventDates: new Set([eventDay]),
-          stallDays: REGION_PROFILES['cz-morava'].secondaryInfection.stallDays,
+          stallDays: REGION_PROFILES['cz-morava'].secondaryInfection.stallDays, thresholds: DEFAULT_GOIDANICH_THRESHOLDS,
         }).state
         pctByDate.set(d, expected.accumulatedPct)
       }

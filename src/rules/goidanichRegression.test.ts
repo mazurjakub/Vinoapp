@@ -5,6 +5,7 @@
  */
 
 import { describe, expect, it } from 'vitest'
+import { DEFAULT_GOIDANICH_THRESHOLDS } from './regionProfiles'
 import type { HourlyWeather } from '../db/schema'
 import fixture from './fixtures/goidanichVelkePavlovice2026.json'
 import { advanceGoidanichCycle, initialGoidanichCycleState } from './goidanichCycle'
@@ -20,7 +21,7 @@ const hourly: HourlyWeather[] = fixture.time.map((time, i) => ({
   precipitation: fixture.precipitation[i],
 }))
 
-const options = { primaryEventDates: new Set(['2026-09-30']), stallDays: 21 }
+const options = { primaryEventDates: new Set(['2026-09-30']), stallDays: 21, thresholds: DEFAULT_GOIDANICH_THRESHOLDS }
 
 function runCycle() {
   let state = initialGoidanichCycleState()

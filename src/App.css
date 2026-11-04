@@ -642,28 +642,31 @@ button {
   min-width: 0;
 }
 
-.chart-table {
-  overflow-x: auto;
+.chart-outlook {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
 }
 
-.chart-table summary {
+.chart-outlook-muted {
+  color: var(--chart-muted);
+  font-weight: 400;
+}
+
+@media (max-width: 480px) {
+  .chart-legend .chart-legend-wide-only {
+    display: none;
+  }
+}
+
+.table-toggle {
+  margin-top: 16px;
+}
+
+.table-toggle summary {
   cursor: pointer;
   font-size: 13px;
   margin-bottom: 8px;
-}
-
-.chart-table table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-}
-
-.chart-table th,
-.chart-table td {
-  padding: 4px 6px;
-  border-bottom: 1px solid var(--border);
-  text-align: left;
-  white-space: nowrap;
 }
 
 @media (max-width: 480px) {
@@ -691,12 +694,11 @@ button {
   --chart-threshold: #6b7280;
   --chart-muted: #6b7280;
   --chart-forecast-bg: rgba(107, 114, 128, 0.14);
-  /* High is more saturated and has a solid border, so the two top zones differ
-     by more than hue alone in both themes. */
-  --zone-medium: rgba(250, 178, 25, 0.18);
-  --zone-medium-border: rgba(217, 142, 10, 0.6);
-  --zone-high: rgba(208, 59, 59, 0.3);
-  --zone-high-border: rgba(166, 32, 32, 0.85);
+  /* The Goidanich warning area; its edge and the end of incubation are labelled in the chart. */
+  --zone-alert: rgba(234, 120, 8, 0.18);
+  --chart-spray: #047857;
+  --chart-off-season: rgba(107, 114, 128, 0.32);
+  --chart-off-season-bg: rgba(107, 114, 128, 0.06);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -710,9 +712,9 @@ button {
     --chart-threshold: #9ca3af;
     --chart-muted: #9ca3af;
     --chart-forecast-bg: rgba(156, 163, 175, 0.18);
-    --zone-medium: rgba(250, 178, 25, 0.22);
-    --zone-medium-border: rgba(250, 178, 25, 0.6);
-    --zone-high: rgba(208, 59, 59, 0.34);
-    --zone-high-border: rgba(248, 113, 113, 0.9);
+    --zone-alert: rgba(251, 146, 60, 0.24);
+    --chart-spray: #34d399;
+    --chart-off-season: rgba(156, 163, 175, 0.34);
+    --chart-off-season-bg: rgba(156, 163, 175, 0.06);
   }
 }

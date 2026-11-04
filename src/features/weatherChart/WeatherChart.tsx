@@ -25,6 +25,8 @@ import type { DailyRisk, InfectionEvent } from '../../db/schema'
 import { getSetting } from '../../db/settingsRepo'
 import {
   addDaysUTC,
+  daysBetween,
+  GOIDANICH_TABLE_MIN_TEMP_C,
   goidanichDayStatus,
   groupByDay,
   REGION_PROFILES,
@@ -45,7 +47,8 @@ import { projectGoidanich, projectGublerScore } from '../risk/riskProjection'
 import { getWeatherCache } from '../weather/weatherCacheRepo'
 import { localDateKey } from '../weather/format'
 import { forecastBoundaryIndex, isForecastDate } from './chartLayout'
-import { GOIDANICH_END_BAND_PCT, GOIDANICH_ZONES, GUBLER_THRESHOLDS, goidanichBandRange, gublerRiskForScore } from './riskZones'
+import { GUBLER_THRESHOLDS, gublerRiskForScore } from './riskZones'
+import { firstOffSeasonDate, goidanichIncrements, goidanichOutlook, type GoidanichOutlook } from './goidanichOutlook'
 import { isLonePoint, splitCycles, splitForecastSeries } from './splitForecastSeries'
 import { buildWeatherSeries, type WeatherPoint } from './weatherSeries'
 import ChartLegend, { type LegendItem } from './ChartLegend'
@@ -53,6 +56,13 @@ import DaySummary from './DaySummary'
 
 const WINDOW_DAYS = 7
 const PANEL_HEIGHT = 190
+/** A bit taller than the other panels, so the two threshold labels fit between their lines. */
+const GOIDANICH_PANEL_HEIGHT = 210
+/** The season-end label moves to the bottom when "today" is this many days away or closer, so the two don't overlap. */
+const SEASON_END_LABEL_NEAR_TODAY_DAYS = 4
+const OFF_SEASON_PATTERN_ID = 'goidanich-off-season'
+/** Below this many in-season days in the window, the threshold labels show only the number. */
+const SHORT_THRESHOLD_LABEL_DAYS = 7
 const GOIDANICH_MIN_AXIS_MAX = 120
 const GOIDANICH_TICKS = [0, 25, 50, 75, 100]
 const GUBLER_TICKS = [0, 20, 40, 60, 80, 100]
@@ -68,7 +78,8 @@ interface ChartRow extends WeatherPoint {
   goidanichNextForecast: number | null
   gublerMeasured: number | null
   gublerForecast: number | null
-  goidanichBand: [number, number] | null
+  goidanichIncrementPct: number | null
+  goidanichCold: boolean
 }
 
 /** An index changes once a day, so its line is stepped. A lone day has no segment, so it gets a dot. */
@@ -97,26 +108,56 @@ function indexLine(rows: ChartRow[], dataKey: keyof ChartRow, color: string, das
   )
 }
 
-/** One day's Goidanich band: near-end from 90%, with the end band on top once the index reached 100%. */
-function GoidanichBandDay(props: { x?: number; y?: number; width?: number; height?: number; payload?: ChartRow }) {
-  const { x, y, width, height, payload } = props
-  const band = payload?.goidanichBand
-  if (x === undefined || y === undefined || width === undefined || height === undefined || !band) return <g />
-  const reachedEnd = band[1] > GOIDANICH_ZONES.urgent
-  const endHeight = reachedEnd ? (height * GOIDANICH_END_BAND_PCT) / (band[1] - band[0]) : 0
-  return (
-    <g>
-      {reachedEnd && <rect x={x} y={y} width={width} height={endHeight} fill="var(--zone-high)" />}
-      <rect x={x} y={y + endHeight} width={width} height={height - endHeight} fill="var(--zone-medium)" />
-    </g>
-  )
+function goidanichValues(rows: ChartRow[]): number[] {
+  return rows.map((p) => p.goidanichPct).filter((v): v is number => v !== null)
 }
 
-/** Small triangle marker for a primary-infection event, placed at the top of its panel. */
+type Translate = (key: string, options?: Record<string, unknown>) => string
+
+/**
+ * The one sentence above the Goidanich panel: where the index is now and what
+ * the forecast says. `null` when there is no cycle to talk about.
+ */
+function goidanichOutlookText(outlook: GoidanichOutlook, t: Translate, dateLabel: (date: string) => string): string | null {
+  if (outlook.kind === 'none') return null
+  if (outlook.kind === 'seasonOver') return t('weatherChart.outlook.seasonOver')
+  const { alert, urgent, cold } = outlook
+  const coldParams = { temperature: GOIDANICH_TABLE_MIN_TEMP_C }
+  if (urgent.status === 'reached') return t('weatherChart.outlook.ended', { date: dateLabel(urgent.date) })
+  if (alert.status === 'estimated') return t('weatherChart.outlook.alertEstimated', { date: dateLabel(alert.date) })
+  if (alert.status === 'reached') {
+    if (urgent.status === 'estimated') return t('weatherChart.outlook.aboveAlertEndEstimated', { date: dateLabel(urgent.date) })
+    return cold ? t('weatherChart.outlook.aboveAlertCold', coldParams) : t('weatherChart.outlook.aboveAlertNoEnd')
+  }
+  return cold ? t('weatherChart.outlook.belowAlertCold', coldParams) : t('weatherChart.outlook.belowAlert')
+}
+
+/** Triangle on the X axis for a primary-infection event, pointing up into the panel. */
 function EventMarker(props: { cx?: number; cy?: number }) {
   const { cx, cy } = props
   if (cx === undefined || cy === undefined) return <g />
-  return <polygon points={`${cx},${cy + 7} ${cx - 6},${cy - 5} ${cx + 6},${cy - 5}`} fill="var(--chart-event)" />
+  return <polygon points={`${cx},${cy - 8} ${cx - 6},${cy + 3} ${cx + 6},${cy + 3}`} fill="var(--chart-event)" />
+}
+
+/** Square on the X axis for a downy spray, which restarts the index. */
+function SprayMarker(props: { cx?: number; cy?: number }) {
+  const { cx, cy } = props
+  if (cx === undefined || cy === undefined) return <g />
+  return <rect x={cx - 5} y={cy - 7} width={10} height={10} fill="var(--chart-spray)" />
+}
+
+/** Diagonal hatching for the days after the season end, unlike the plain grey of the forecast. */
+function OffSeasonPattern() {
+  return (
+    <svg width={0} height={0} aria-hidden="true" style={{ position: 'absolute' }}>
+      <defs>
+        <pattern id={OFF_SEASON_PATTERN_ID} patternUnits="userSpaceOnUse" width={7} height={7} patternTransform="rotate(45)">
+          <rect width={7} height={7} fill="var(--chart-off-season-bg)" />
+          <line x1={0} y1={0} x2={0} y2={7} stroke="var(--chart-off-season)" strokeWidth={2.5} />
+        </pattern>
+      </defs>
+    </svg>
+  )
 }
 
 function WeatherChart({ vineyardId }: { vineyardId: number }) {
@@ -134,7 +175,9 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
 
   const vineyard = useLiveQuery(() => db.vineyards.get(vineyardId), [vineyardId])
   const cache = useLiveQuery(() => getWeatherCache(vineyardId), [vineyardId])
-  const storedRows = useLiveQuery<DailyRisk[]>(() => listDailyRiskWindow(vineyardId, from, to), [vineyardId, from, to])
+  // One day before the window too, so the first day's increment can be told.
+  const seriesFrom = addDaysUTC(from, -1)
+  const storedRows = useLiveQuery<DailyRisk[]>(() => listDailyRiskWindow(vineyardId, seriesFrom, to), [vineyardId, seriesFrom, to])
   const phenology = useLiveQuery(() => getPhenologyDatesForYear(vineyardId, year), [vineyardId, year])
   const goidanichRecord = useLiveQuery(
     () => getSetting<DailyAccumulatorRecord<GoidanichCycleState>>(`goidanichState:${vineyardId}:${year}`),
@@ -155,6 +198,13 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
   )
   const lastDownySprayDatetime = useLiveQuery(() => getLastSprayDatetime(vineyardId, 'downy'), [vineyardId])
   const lastPowderySprayDatetime = useLiveQuery(() => getLastSprayDatetime(vineyardId, 'powdery'), [vineyardId])
+  const downySprayDates = useLiveQuery(
+    async () =>
+      (await db.sprays.where('vineyardId').equals(vineyardId).and((s) => s.target === 'downy').toArray()).map((s) =>
+        s.datetime.slice(0, 10),
+      ),
+    [vineyardId],
+  )
 
   if (
     !vineyard ||
@@ -163,7 +213,8 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
     storedRows === undefined ||
     primaryEvents === undefined ||
     lastDownySprayDatetime === undefined ||
-    lastPowderySprayDatetime === undefined
+    lastPowderySprayDatetime === undefined ||
+    downySprayDates === undefined
   ) {
     return <p className="empty">{t('weatherChart.loading')}</p>
   }
@@ -186,6 +237,7 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
         {
           primaryEventDates: new Set(primaryEvents.map((e) => e.date)),
           stallDays: secondaryProfile.stallDays,
+          thresholds: secondaryProfile.thresholdsPct,
           requireWetHours: secondaryProfile.requireWetHours,
         },
         isSecondarySeasonOver,
@@ -195,8 +247,8 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
   const gublerStart = resolveGublerStart(phenology.budbreak ?? `${year}-01-01`, lastPowderySprayDatetime?.slice(0, 10))
   const gublerProjected = projectGublerScore(gublerRecord, gublerStart.resetFromDate, days, gublerStart.initialState)
 
-  const points = buildWeatherSeries({
-    from,
+  const extendedPoints = buildWeatherSeries({
+    from: seriesFrom,
     to,
     storedRows,
     liveDays: days,
@@ -204,6 +256,11 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
     gublerProjected,
     primaryEventDates: new Set(primaryEvents.map((e) => e.date)),
   })
+  const increments = goidanichIncrements(
+    extendedPoints.map((p) => ({ date: p.date, pct: p.goidanichPct, meanTempC: p.meanTempC })),
+    GOIDANICH_TABLE_MIN_TEMP_C,
+  ).slice(1)
+  const points = extendedPoints.slice(1)
 
   const boundaryIndex = forecastBoundaryIndex(points.map((p) => p.date), today)
   const temp = splitForecastSeries(points.map((p) => p.meanTempC), boundaryIndex)
@@ -222,8 +279,23 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
     goidanichNextForecast: goidanichNext.forecast[i],
     gublerMeasured: gubler.measured[i],
     gublerForecast: gubler.forecast[i],
-    goidanichBand: goidanichBandRange(p.goidanichPct),
+    goidanichIncrementPct: increments[i].incrementPct,
+    goidanichCold: increments[i].cold,
   }))
+  const goidanichThresholds = secondaryProfile.thresholdsPct
+  const alertPct = goidanichThresholds.warning
+  const offSeasonFrom = firstOffSeasonDate(rows.map((p) => p.date), isSecondarySeasonOver)
+  // The risk bands stop where the season ends; outside it nothing warns.
+  const lastInSeasonDate = offSeasonFrom === null ? to : offSeasonFrom > from ? addDaysUTC(offSeasonFrom, -1) : null
+  const outlook = goidanichOutlook({
+    days: points.map((p) => ({ date: p.date, pct: p.goidanichPct, meanTempC: p.meanTempC })),
+    today,
+    thresholds: { alert: alertPct, urgent: goidanichThresholds.urgent },
+    isSeasonOver: isSecondarySeasonOver,
+    minTempC: GOIDANICH_TABLE_MIN_TEMP_C,
+  })
+  const sprayRows = rows.filter((p) => downySprayDates.includes(p.date))
+  const showGoidanichChart = goidanichValues(rows).length > 0 || offSeasonFrom !== null || outlook.kind !== 'none'
 
   const forecastFrom = boundaryIndex === -1 ? null : rows[boundaryIndex].date
   const forecastTo = rows[rows.length - 1].date
@@ -234,8 +306,7 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
   const precipitationThresholdMm = REGION_PROFILES[vineyard.regionProfile].primaryInfection.minPrecipitation24hMm
   const precips = rows.map((p) => p.precipitationMm).filter((v): v is number => v !== null)
   const precipMax = Math.max(precipitationThresholdMm + 2, 5, Math.ceil(Math.max(0, ...precips)))
-  const goidanichValues = rows.map((p) => p.goidanichPct).filter((v): v is number => v !== null)
-  const goidanichMax = Math.max(GOIDANICH_MIN_AXIS_MAX, Math.ceil(Math.max(0, ...goidanichValues)) + 5)
+  const goidanichMax = Math.max(GOIDANICH_MIN_AXIS_MAX, Math.ceil(Math.max(0, ...goidanichValues(rows))) + 5)
   const hasForecastValue = (value: (p: WeatherPoint) => number | null) =>
     boundaryIndex !== -1 && points.slice(boundaryIndex).some((p) => value(p) !== null)
   const eventRows = rows.filter((p) => p.primaryEvent)
@@ -275,13 +346,17 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
         }
       />
     )
-  const todayLine = (yAxisId?: string) => (
+  const todayLine = (yAxisId?: string, showLabel = true) => (
     <ReferenceLine
       {...(yAxisId ? { yAxisId } : {})}
       x={today}
       stroke="var(--chart-today)"
       strokeDasharray="2 2"
-      label={{ value: t('weatherChart.today'), position: 'insideTop', style: { fill: 'var(--chart-today)', fontSize: 10, fontWeight: 600 } }}
+      label={
+        showLabel
+          ? { value: t('weatherChart.today'), position: 'insideTop', style: { fill: 'var(--chart-today)', fontSize: 10, fontWeight: 600 } }
+          : undefined
+      }
     />
   )
   // No floating box (`content={() => null}`) — just the synced vertical
@@ -290,8 +365,111 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
   // panels instead, so nothing ever overlaps the plot.
   const cursorTooltip = <Tooltip content={() => null} cursor={{ stroke: 'var(--chart-muted)', strokeOpacity: 0.6 }} />
 
-  const zoneMedium = { kind: 'zone', fill: 'var(--zone-medium)', border: 'var(--zone-medium-border)', dashedBorder: true } as const
-  const zoneHigh = { kind: 'zone', fill: 'var(--zone-high)', border: 'var(--zone-high-border)' } as const
+  // The line stops at the season end. Each label sits just above its own line at the right end,
+  // away from where a cycle usually starts. The warning edge needs no line of its own: the area shows it.
+  const seasonOverToday = isSecondarySeasonOver(today)
+  const goidanichThreshold = (y: number, label: string, withLine: boolean) =>
+    lastInSeasonDate && [
+      withLine && (
+        <ReferenceLine
+          key={`line-${y}`}
+          segment={[
+            { x: from, y },
+            { x: lastInSeasonDate, y },
+          ]}
+          stroke="var(--chart-threshold)"
+          strokeWidth={1}
+          ifOverflow="hidden"
+        />
+      ),
+      !seasonOverToday && (
+      <ReferenceDot
+        key={`label-${y}`}
+        x={lastInSeasonDate}
+        y={y}
+        r={0}
+        ifOverflow="hidden"
+        label={(props: { viewBox?: { x?: number; y?: number } }) => (
+          <text x={props.viewBox?.x} y={(props.viewBox?.y ?? 0) - 3} textAnchor="end" fontSize={9} fill="var(--chart-threshold)">
+            {label}
+          </text>
+        )}
+      />
+      ),
+    ]
+  // A faint line from a marker on the axis up to its label at the top, where the index line rarely is
+  // (a cycle starts at 0). On today the label goes a little lower, below the "today" label.
+  const markerLine = (date: string, label: string, color: string) => (
+    <ReferenceLine
+      key={`marker-${label}-${date}`}
+      x={date}
+      stroke={color}
+      strokeOpacity={0.45}
+      strokeDasharray="2 3"
+      label={{ value: label, position: 'insideTop', offset: date === today ? 18 : 4, style: { fill: color, fontSize: 9 } }}
+    />
+  )
+  // One warning area from the alert threshold up, only until the season end.
+  const alertArea = lastInSeasonDate && (
+    <ReferenceArea x1={from} x2={lastInSeasonDate} y1={alertPct} y2={goidanichMax} fill="var(--zone-alert)" fillOpacity={1} stroke="none" ifOverflow="hidden" />
+  )
+  const seasonEndNearToday = offSeasonFrom !== null && Math.abs(daysBetween(offSeasonFrom, today)) <= SEASON_END_LABEL_NEAR_TODAY_DAYS
+  const offSeasonArea = (showLabel: boolean) =>
+    offSeasonFrom && (
+      <ReferenceArea
+        x1={offSeasonFrom}
+        x2={to}
+        fill={`url(#${OFF_SEASON_PATTERN_ID})`}
+        fillOpacity={1}
+        stroke="none"
+        ifOverflow="hidden"
+        label={
+          showLabel
+            ? { value: t('weatherChart.offSeason'), position: 'center', style: { fill: 'var(--chart-muted)', fontSize: 11, fontWeight: 600 } }
+            : undefined
+        }
+      />
+    )
+  const seasonEndLine = (showLabel: boolean) =>
+    offSeasonFrom &&
+    offSeasonFrom > from && (
+      <ReferenceLine
+        x={offSeasonFrom}
+        position="start"
+        stroke="var(--chart-muted)"
+        label={
+          showLabel
+            ? {
+                value: t('weatherChart.seasonEnd'),
+                // "today" is labelled at the top, so near it this label goes to the bottom.
+                position: seasonEndNearToday ? 'insideBottomLeft' : 'insideTopLeft',
+                style: { fill: 'var(--chart-muted)', fontSize: 9 },
+              }
+            : undefined
+        }
+      />
+    )
+  const goidanichForecastBand = (showLabel: boolean) =>
+    forecastFrom &&
+    (offSeasonFrom === null || forecastFrom < offSeasonFrom) && (
+      <ReferenceArea
+        x1={forecastFrom}
+        x2={offSeasonFrom ? addDaysUTC(offSeasonFrom, -1) : forecastTo}
+        fill="var(--chart-forecast-bg)"
+        stroke="none"
+        ifOverflow="extendDomain"
+        label={
+          showLabel
+            ? { value: t('weatherChart.forecastBandLabel'), position: 'insideTopRight', style: { fill: 'var(--chart-muted)', fontSize: 10 } }
+            : undefined
+        }
+      />
+    )
+  const outlookText = goidanichOutlookText(outlook, t, dateLabel)
+  // With only a few in-season days left in the window, the full labels would run over the axis.
+  const inSeasonDays = lastInSeasonDate ? rows.filter((p) => p.date <= lastInSeasonDate).length : 0
+  const thresholdLabel = (key: string, value: number) =>
+    inSeasonDays < SHORT_THRESHOLD_LABEL_DAYS ? t('weatherChart.thresholdShort', { value }) : t(key, { value })
   const gublerThreshold = (y: number, label: string, position: 'insideTopLeft' | 'insideBottomLeft') => (
     <ReferenceLine
       y={y}
@@ -310,21 +488,19 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
     { label: t('weatherChart.precip'), swatch: { kind: 'bar', color: 'var(--chart-precip)' } },
     { label: t('weatherChart.legend.precipThreshold'), swatch: { kind: 'line', color: 'var(--chart-threshold)', dashed: true } },
   ]
+  // Hidden on a narrow screen: the chart labels the markers itself, and solid/dashed is self-evident next to the grey forecast.
   const goidanichLegend: LegendItem[] = [
     ...(rows.some((p) => p.goidanichMeasured !== null || p.goidanichNextMeasured !== null)
-      ? [{ label: t('weatherChart.legend.indexHistory'), swatch: { kind: 'line', color: 'var(--chart-goidanich)' } } as const]
+      ? [{ label: t('weatherChart.legend.indexHistory'), swatch: { kind: 'line', color: 'var(--chart-goidanich)' }, wideOnly: true } as const]
       : []),
     ...(hasForecastValue((p) => p.goidanichPct)
-      ? [{ label: t('weatherChart.legend.indexForecast'), swatch: { kind: 'line', color: 'var(--chart-goidanich)', dashed: true } } as const]
-      : []),
-    ...(rows.some((p) => p.goidanichBand)
-      ? [{ label: t('weatherChart.legend.incubationNearEnd'), swatch: zoneMedium }]
-      : []),
-    ...(rows.some((p) => p.goidanichPct !== null && p.goidanichPct >= GOIDANICH_ZONES.urgent)
-      ? [{ label: t('weatherChart.legend.incubationEnd'), swatch: zoneHigh }]
+      ? [{ label: t('weatherChart.legend.indexForecast'), swatch: { kind: 'line', color: 'var(--chart-goidanich)', dashed: true }, wideOnly: true } as const]
       : []),
     ...(eventRows.length > 0
-      ? [{ label: t('weatherChart.primaryEvent'), swatch: { kind: 'marker', color: 'var(--chart-event)' } } as const]
+      ? [{ label: t('weatherChart.primaryEvent'), swatch: { kind: 'marker', color: 'var(--chart-event)' }, wideOnly: true } as const]
+      : []),
+    ...(sprayRows.length > 0
+      ? [{ label: t('weatherChart.legend.spray'), swatch: { kind: 'square', color: 'var(--chart-spray)' }, wideOnly: true } as const]
       : []),
   ]
   const gublerLegend: LegendItem[] = [
@@ -347,6 +523,7 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
 
   return (
     <figure className="weather-chart">
+      <OffSeasonPattern />
       <figcaption className="weather-chart-caption">
         {t('weatherChart.caption')} <span className="empty">({t('weatherChart.indicative')})</span>
       </figcaption>
@@ -378,7 +555,7 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
               onTouchMove={handleChartActivity}
               onClick={handleChartActivity}
             >
-              <CartesianGrid strokeDasharray="2 3" stroke="var(--border)" />
+              <CartesianGrid strokeDasharray="2 3" stroke="var(--border)" vertical={false} />
               {xAxis}
               <YAxis yAxisId="precip" domain={[0, precipMax]} tick={{ fontSize: 10 }} tickFormatter={axisNumber} width={28} />
               <YAxis yAxisId="temp" orientation="right" tick={{ fontSize: 10 }} tickFormatter={axisNumber} width={28} />
@@ -426,10 +603,14 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
 
         <div className="chart-panel">
           <h3 className="chart-panel-title">{t('weatherChart.goidanich')}</h3>
-          {goidanichValues.length === 0 && <p className="empty">{t('weatherChart.noIncubation')}</p>}
-          {goidanichValues.length > 0 && <ChartLegend items={goidanichLegend} />}
-          {goidanichValues.length > 0 && (
-          <ResponsiveContainer width="100%" height={PANEL_HEIGHT}>
+          {!showGoidanichChart && <p className="empty">{t('weatherChart.noIncubation')}</p>}
+          {showGoidanichChart && outlookText && (
+            <p className={`chart-outlook${outlook.kind === 'seasonOver' ? ' chart-outlook-muted' : ''}`}>{outlookText}</p>
+          )}
+          {showGoidanichChart && goidanichLegend.length > 0 && <ChartLegend items={goidanichLegend} />}
+          {showGoidanichChart && (
+          <>
+          <ResponsiveContainer width="100%" height={GOIDANICH_PANEL_HEIGHT}>
             <ComposedChart
               data={rows}
               syncId="weatherChart"
@@ -438,32 +619,32 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
               onTouchMove={handleChartActivity}
               onClick={handleChartActivity}
             >
-              <CartesianGrid strokeDasharray="2 3" stroke="var(--border)" />
+              <CartesianGrid strokeDasharray="2 3" stroke="var(--border)" vertical={false} />
               {xAxis}
               <YAxis domain={[INDEX_AXIS_MIN, goidanichMax]} ticks={GOIDANICH_TICKS} interval={0} tick={{ fontSize: 10 }} tickFormatter={axisNumber} width={28} />
-              {forecastBand(false)}
-              {/* A full-width bar per day: the bands appear only on days the index really reached them. */}
-              <Bar dataKey="goidanichBand" barSize={1000} shape={GoidanichBandDay} legendType="none" isAnimationActive={false} />
+              {alertArea}
+              {goidanichForecastBand(true)}
+              {offSeasonArea(true)}
+              {seasonEndLine(true)}
               {todayLine()}
-              {/* The 90% label sits below its line and the 100% label above its own, so they can't overlap. */}
-              <ReferenceLine y={GOIDANICH_ZONES.warning} stroke="var(--chart-threshold)" strokeDasharray="4 2" label={{ value: t('weatherChart.thresholdWarning'), position: 'insideTopLeft', style: { fill: 'var(--chart-threshold)', fontSize: 9 } }} />
-              <ReferenceLine y={GOIDANICH_ZONES.urgent} stroke="var(--chart-threshold)" strokeDasharray="4 2" label={{ value: t('weatherChart.thresholdUrgent'), position: 'insideBottomLeft', offset: 8, style: { fill: 'var(--chart-threshold)', fontSize: 9 } }} />
+              {goidanichThreshold(alertPct, thresholdLabel('weatherChart.thresholdWarning', alertPct), false)}
+              {goidanichThreshold(goidanichThresholds.urgent, thresholdLabel('weatherChart.thresholdUrgent', goidanichThresholds.urgent), true)}
               {indexLine(rows, 'goidanichMeasured', 'var(--chart-goidanich)', false)}
               {indexLine(rows, 'goidanichForecast', 'var(--chart-goidanich)', true, boundaryIndex)}
               {indexLine(rows, 'goidanichNextMeasured', 'var(--chart-goidanich)', false)}
               {indexLine(rows, 'goidanichNextForecast', 'var(--chart-goidanich)', true, boundaryIndex)}
+              {eventRows.map((p) => markerLine(p.date, t('weatherChart.eventShort'), 'var(--chart-event)'))}
+              {sprayRows.map((p) => markerLine(p.date, t('weatherChart.sprayShort'), 'var(--chart-spray)'))}
               {eventRows.map((p) => (
-                <ReferenceDot
-                  key={p.date}
-                  x={p.date}
-                  y={goidanichMax}
-                  shape={EventMarker}
-                  label={{ value: t('weatherChart.primaryEvent'), position: 'top', style: { fill: 'var(--chart-event)', fontSize: 9 } }}
-                />
+                <ReferenceDot key={`event-${p.date}`} x={p.date} y={INDEX_AXIS_MIN} shape={EventMarker} ifOverflow="visible" />
+              ))}
+              {sprayRows.map((p) => (
+                <ReferenceDot key={`spray-${p.date}`} x={p.date} y={INDEX_AXIS_MIN} shape={SprayMarker} ifOverflow="visible" />
               ))}
               {cursorTooltip}
             </ComposedChart>
           </ResponsiveContainer>
+          </>
           )}
         </div>
 
@@ -479,7 +660,7 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
               onTouchMove={handleChartActivity}
               onClick={handleChartActivity}
             >
-              <CartesianGrid strokeDasharray="2 3" stroke="var(--border)" />
+              <CartesianGrid strokeDasharray="2 3" stroke="var(--border)" vertical={false} />
               {xAxis}
               <YAxis domain={[INDEX_AXIS_MIN, 100]} ticks={GUBLER_TICKS} interval={0} tick={{ fontSize: 10 }} tickFormatter={axisNumber} width={28} />
               {forecastBand(false)}
@@ -496,42 +677,50 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
         </div>
       </div>
 
-      <details className="chart-table">
+      <details className="table-toggle">
         <summary>{t('weatherChart.tableTitle')}</summary>
-        <table>
-          <thead>
-            <tr>
-              <th>{t('weatherChart.columns.date')}</th>
-              <th>{t('weatherChart.columns.source')}</th>
-              <th>{t('weatherChart.columns.temp')}</th>
-              <th>{t('weatherChart.columns.precip')}</th>
-              <th>{t('weatherChart.columns.rh')}</th>
-              <th>{t('weatherChart.columns.goidanich')}</th>
-              <th>{t('weatherChart.columns.gubler')}</th>
-              <th>{t('weatherChart.columns.event')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((p) => (
-              <tr key={p.date}>
-                <td>{dateLabel(p.date)}</td>
-                <td>
-                  {p.date === today
-                    ? t('weatherChart.today')
-                    : isForecastDate(p.date, today)
-                      ? t('weatherChart.sourceForecast')
-                      : t('weatherChart.sourceHistory')}
-                </td>
-                <td>{p.meanTempC === null ? '—' : formatWithUnit(p.meanTempC, '°C', locale, 1)}</td>
-                <td>{p.precipitationMm === null ? '—' : formatWithUnit(p.precipitationMm, 'mm', locale, 1)}</td>
-                <td>{p.meanRhPct === null ? '—' : formatWithUnit(p.meanRhPct, '%', locale, 0)}</td>
-                <td>{p.goidanichPct === null ? '—' : formatNumber(p.goidanichPct, locale, 0)}</td>
-                <td>{p.gublerScore === null ? '—' : formatNumber(p.gublerScore, locale, 0)}</td>
-                <td>{p.primaryEvent ? '✓' : ''}</td>
+        <div className="weather-table-wrap">
+          <table className="weather-table">
+            <thead>
+              <tr>
+                <th>{t('weatherChart.columns.date')}</th>
+                <th>{t('weatherChart.columns.source')}</th>
+                <th>{t('weatherChart.columns.temp')}</th>
+                <th>{t('weatherChart.columns.precip')}</th>
+                <th>{t('weatherChart.columns.rh')}</th>
+                <th>{t('weatherChart.columns.goidanich')}</th>
+                <th>{t('weatherChart.columns.gubler')}</th>
+                <th>{t('weatherChart.columns.event')}</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {rows.map((p) => (
+                <tr key={p.date}>
+                  <td>{dateLabel(p.date)}</td>
+                  <td>
+                    {p.date === today
+                      ? t('weatherChart.today')
+                      : isForecastDate(p.date, today)
+                        ? t('weatherChart.sourceForecast')
+                        : t('weatherChart.sourceHistory')}
+                  </td>
+                  <td>{p.meanTempC === null ? '—' : formatWithUnit(p.meanTempC, '°C', locale, 1)}</td>
+                  <td>{p.precipitationMm === null ? '—' : formatWithUnit(p.precipitationMm, 'mm', locale, 1)}</td>
+                  <td>{p.meanRhPct === null ? '—' : formatWithUnit(p.meanRhPct, '%', locale, 0)}</td>
+                  <td>
+                    {p.goidanichPct !== null
+                      ? formatNumber(p.goidanichPct, locale, 0)
+                      : isSecondarySeasonOver(p.date)
+                        ? t('weatherChart.cycleSeasonOver')
+                        : '—'}
+                  </td>
+                  <td>{p.gublerScore === null ? '—' : formatNumber(p.gublerScore, locale, 0)}</td>
+                  <td>{p.primaryEvent ? '✓' : ''}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </details>
     </figure>
   )

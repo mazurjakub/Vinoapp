@@ -25,6 +25,7 @@
     "noVineyardPrompt": "The forecast and disease risk are calculated from the plot's location. Add and select one on the Overview page.",
     "noData": "No data yet",
     "forecastFrom": "Forecast from {{datetime}}",
+    "hourlyTitle": "Hourly forecast ({{count}} h)",
     "loadForecast": "Load forecast",
     "updateForecast": "Update forecast",
     "updating": "Updating…",
@@ -61,12 +62,28 @@
       "precipThreshold": "Precipitation threshold",
       "indexHistory": "Index (history)",
       "indexForecast": "Index forecast",
-      "incubationNearEnd": "Incubation above 90%",
-      "incubationEnd": "End of incubation (100%)"
+      "spray": "Downy mildew spray (index restart)"
     },
     "thresholdPrecip": "threshold 10 mm (primary infection)",
-    "thresholdWarning": "threshold 90%",
-    "thresholdUrgent": "threshold 100%",
+    "thresholdWarning": "{{value}}% warning",
+    "thresholdUrgent": "{{value}}% end of incubation",
+    "thresholdShort": "{{value}}%",
+    "offSeason": "outside the growing season",
+    "seasonEnd": "end of season",
+    "eventShort": "infection",
+    "sprayShort": "spray",
+    "increment": "Increment",
+    "incrementCold": "0% (cold, mean below {{temperature}} °C)",
+    "outlook": {
+      "alertEstimated": "Risk is rising, warning estimated around {{date}}",
+      "aboveAlertEndEstimated": "Above the warning threshold, end of incubation estimated around {{date}}",
+      "aboveAlertNoEnd": "Above the warning threshold, the end of incubation is not reached in the forecast.",
+      "aboveAlertCold": "Above the warning threshold, the index is not changing because it is cold (mean below {{temperature}} °C).",
+      "belowAlert": "Below the warning threshold, not reached in the forecast.",
+      "belowAlertCold": "Below the warning threshold, the index is not changing because it is cold (mean below {{temperature}} °C).",
+      "ended": "Incubation ended on {{date}}, check the leaves for oil spots.",
+      "seasonOver": "Outside the growing season, the index is not calculated."
+    },
     "riskLabel": "Risk",
     "notActive": "not active yet",
     "daySummaryHint": "Hover over or click the chart for a day's detail.",
@@ -83,7 +100,9 @@
       "gubler": "Gubler-Thomas"
     },
     "dev": {
-      "seed": "DEV: fill with synthetic data",
+      "active": "DEV: active season",
+      "cold": "DEV: cold",
+      "offSeason": "DEV: off season",
       "delete": "DEV: delete synthetic data"
     },
     "noIncubation": "No active incubation",
@@ -147,7 +166,6 @@
   "carePlan": {
     "title": "Care plan",
     "noVineyardPrompt": "The care plan follows the plot's growth stages. Add and select one on the Overview page.",
-    "source": "Source:",
     "currentPhase": "Current stage: {{phase}}",
     "noPhase": "No growth stage recorded for this season yet. Showing the start of the season.",
     "headings": {
@@ -155,10 +173,8 @@
       "upcoming": "Upcoming stages",
       "past": "Past stages"
     },
-    "bbch": "BBCH {{from}}–{{to}}",
     "targets": "Targets:",
-    "threshold": "Indicative threshold:",
-    "inspectionSource": "Source:"
+    "threshold": "Threshold:"
   },
   "harvest": {
     "title": "Harvest",
@@ -286,10 +302,6 @@
     }
   },
   "carePlanData": {
-    "disclaimer": "Recommendations from 2008 (organic farming), not a regulation. Check products and limits against current legislation.",
-    "source": "FiBL / Bioinstitut, Ochrana révy vinné v ekologickém vinohradnictví před hlavními chorobami a škůdci (Czech edition), pp. 2–3, 6–7, 11–12.",
-    "note": "FiBL / Bioinstitut organic plan, Czech adaptation 12/2007. Products, doses and limits are from 2008.",
-    "inspectionSource": "FiBL / Bioinstitut, p. {{pages}}",
     "targets": {
       "mites_calepitrimerus": "Grape rust mite",
       "mites_eriophyes": "Grape erineum mite",
@@ -318,12 +330,12 @@
     },
     "inspections": {
       "mites_calepitrimerus_spring": {
-        "description": "Check for grape rust mites at budbreak (B–D). Larvae hatch 8–10 days after budbreak.",
-        "threshold": "An average of about 90 mites per leaf at budbreak (indicative)."
+        "description": "Check for grape rust mites at budbreak. Larvae hatch 8–10 days after budbreak.",
+        "threshold": "An average of about 90 mites per leaf at budbreak."
       },
       "mites_calepitrimerus_late": {
         "description": "Check again in late summer (veraison).",
-        "threshold": "About 170 mites per leaf at the end of summer (indicative)."
+        "threshold": "About 170 mites per leaf at the end of summer."
       },
       "mites_eriophyes_spring": {
         "description": "At budbreak, check mainly the older lower leaves. The erineum mite has up to 7 generations.",
@@ -333,41 +345,40 @@
         "description": "In late summer (veraison), mark vines with repeated heavy infestation. Treat them in spring before budbreak."
       },
       "phomopsis_b": {
-        "description": "Check around B (01). Remove infected wood and treat the wounds with balm."
+        "description": "Check at the woolly bud stage. Remove infected wood and treat the wounds with balm."
       },
       "powdery_e": {
-        "description": "Check for powdery mildew at E (3–4 leaves). Infection occurs at humidity above 80%; leaf wetness is not required."
+        "description": "Check for powdery mildew at the 3–4 leaf stage. Infection occurs at humidity above 80%; leaf wetness is not required."
       },
       "moth_generation_1": {
-        "description": "1st moth generation: check with pheromone traps between H and I. Caterpillars hatch about 7 days after egg laying.",
+        "description": "1st moth generation: check with pheromone traps from separated flower buds to flowering. Caterpillars hatch about 7 days after egg laying.",
         "threshold": "There is no numeric threshold. Temperatures above 12–15 °C increase caterpillar activity."
       },
       "moth_generation_2": {
-        "description": "2nd moth generation: check around J (73). Caterpillars enter the berries within 4–6 days."
+        "description": "2nd moth generation: check shortly after flowering, when the berries are the size of shot. Caterpillars enter the berries within 4–6 days."
       },
       "spider_mite_panonychus_dormant": {
         "description": "Check the wood during pruning for eggs at the bud bases. Direct protection is neither necessary nor possible.",
         "threshold": "More than 80% of bud bases with eggs."
       },
       "spider_mite_panonychus_leaves": {
-        "description": "Check the leaves at the 3-leaf stage (E).",
-        "threshold": "More than 70% of leaves occupied at E."
+        "description": "Check the leaves at the 3-leaf stage.",
+        "threshold": "More than 70% of leaves occupied at the 3-leaf stage."
       },
       "spider_mite_tetranychus": {
         "description": "Check the leaves for mites from May to July.",
-        "threshold": "May–June: 30–40% of leaves with mites; July–August: 20–30%. Direct protection is not possible in organic viticulture.",
-        "note": "The book gives calendar months (May–July), not BBCH. The BBCH range is approximate."
+        "threshold": "May–June: 30–40% of leaves with mites; July–August: 20–30%. Direct protection is not possible in organic viticulture."
       },
       "leafhopper_yellow_traps": {
-        "description": "Yellow sticky traps at stages F–H. Check the leaves for larvae."
+        "description": "Yellow sticky traps from visible inflorescences until the flower buds separate. Check the leaves for larvae."
       },
       "leafhopper_generation_1": {
-        "description": "1st generation: check the leaves for larvae at stage I.",
-        "threshold": "4–5 larvae per leaf at stage I (1st generation). Direct protection is usually not necessary."
+        "description": "1st generation: check the leaves for larvae at flowering.",
+        "threshold": "4–5 larvae per leaf at flowering (1st generation). Direct protection is usually not necessary."
       },
       "leafhopper_generation_2": {
-        "description": "2nd generation: check the leaves for larvae at stage L.",
-        "threshold": "4–5 larvae per leaf at stage L (2nd generation). Direct protection is usually not necessary."
+        "description": "2nd generation: check the leaves for larvae at bunch closure.",
+        "threshold": "4–5 larvae per leaf at bunch closure (2nd generation). Direct protection is usually not necessary."
       }
     }
   },

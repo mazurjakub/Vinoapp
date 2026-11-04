@@ -25,6 +25,7 @@
     "noVineyardPrompt": "Předpověď a riziko chorob se počítají podle polohy parcely. Přidejte a vyberte ji na stránce Přehled.",
     "noData": "Zatím žádná data",
     "forecastFrom": "Předpověď z {{datetime}}",
+    "hourlyTitle": "Hodinová předpověď ({{count}} h)",
     "loadForecast": "Načíst předpověď",
     "updateForecast": "Aktualizovat předpověď",
     "updating": "Aktualizuji…",
@@ -61,12 +62,28 @@
       "precipThreshold": "Práh srážek",
       "indexHistory": "Index (historie)",
       "indexForecast": "Předpověď indexu",
-      "incubationNearEnd": "Inkubace nad 90 %",
-      "incubationEnd": "Konec inkubace (100 %)"
+      "spray": "Postřik proti plísni (restart indexu)"
     },
     "thresholdPrecip": "práh 10 mm (primární infekce)",
-    "thresholdWarning": "práh 90 %",
-    "thresholdUrgent": "práh 100 %",
+    "thresholdWarning": "{{value}} % varování",
+    "thresholdUrgent": "{{value}} % konec inkubace",
+    "thresholdShort": "{{value}} %",
+    "offSeason": "mimo vegetaci",
+    "seasonEnd": "konec sezóny",
+    "eventShort": "infekce",
+    "sprayShort": "postřik",
+    "increment": "Přírůstek",
+    "incrementCold": "0 % (chladno, průměr pod {{temperature}} °C)",
+    "outlook": {
+      "alertEstimated": "Riziko roste, varování odhadem kolem {{date}}",
+      "aboveAlertEndEstimated": "Nad prahem varování, konec inkubace odhadem kolem {{date}}",
+      "aboveAlertNoEnd": "Nad prahem varování, konce inkubace se v předpovědi nedosáhne.",
+      "aboveAlertCold": "Nad prahem varování, index se nemění, je chladno (průměr pod {{temperature}} °C).",
+      "belowAlert": "Pod prahem varování, v předpovědi se ho nedosáhne.",
+      "belowAlertCold": "Pod prahem varování, index se nemění, je chladno (průměr pod {{temperature}} °C).",
+      "ended": "Inkubace skončila {{date}}, zkontrolujte listy na olejové skvrny.",
+      "seasonOver": "Mimo vegetaci, index se nepočítá."
+    },
     "riskLabel": "Riziko",
     "notActive": "zatím neaktivní",
     "daySummaryHint": "Najeďte myší nebo klikněte na graf pro detail dne.",
@@ -83,7 +100,9 @@
       "gubler": "Gubler-Thomas"
     },
     "dev": {
-      "seed": "DEV: naplnit syntetická data",
+      "active": "DEV: aktivní sezóna",
+      "cold": "DEV: chladno",
+      "offSeason": "DEV: mimo sezónu",
       "delete": "DEV: smazat syntetická data"
     },
     "noIncubation": "Žádná aktivní inkubace",
@@ -147,7 +166,6 @@
   "carePlan": {
     "title": "Plán péče",
     "noVineyardPrompt": "Plán péče se řídí růstovými fázemi parcely. Přidejte a vyberte ji na stránce Přehled.",
-    "source": "Zdroj:",
     "currentPhase": "Aktuální fáze: {{phase}}",
     "noPhase": "Pro letošek není zapsaná žádná růstová fáze. Zobrazuji začátek sezóny.",
     "headings": {
@@ -155,10 +173,8 @@
       "upcoming": "Následující stádia",
       "past": "Prošlá stádia"
     },
-    "bbch": "BBCH {{from}}–{{to}}",
     "targets": "Cíle:",
-    "threshold": "Orientační práh:",
-    "inspectionSource": "Zdroj:"
+    "threshold": "Práh:"
   },
   "harvest": {
     "title": "Úroda",
@@ -286,10 +302,6 @@
     }
   },
   "carePlanData": {
-    "disclaimer": "Doporučení z roku 2008 (ekologické hospodaření), není předpis. Přípravky a limity ověřte podle aktuální legislativy.",
-    "source": "FiBL / Bioinstitut, Ochrana révy vinné v ekologickém vinohradnictví před hlavními chorobami a škůdci, s. 2–3, 6–7, 11–12.",
-    "note": "Ekologický plán FiBL / Bioinstitut, ČR úprava 12/2007. Přípravky, dávky a limity jsou z roku 2008.",
-    "inspectionSource": "FiBL / Bioinstitut, s. {{pages}}",
     "targets": {
       "mites_calepitrimerus": "Hálčivec révový",
       "mites_eriophyes": "Vlnovníkovec révový",
@@ -318,12 +330,12 @@
     },
     "inspections": {
       "mites_calepitrimerus_spring": {
-        "description": "Při rašení (B–D) kontrolovat hálčivce. Larvy se líhnou 8–10 dní po vyrašení.",
-        "threshold": "Průměrně ~90 roztočů na list při rašení (orientační)."
+        "description": "Při rašení kontrolovat hálčivce. Larvy se líhnou 8–10 dní po vyrašení.",
+        "threshold": "Průměrně ~90 roztočů na list při rašení."
       },
       "mites_calepitrimerus_late": {
         "description": "Znovu kontrolovat v pozdním létě (zaměkání).",
-        "threshold": "Přibližně ~170 roztočů na list koncem léta (orientační)."
+        "threshold": "Přibližně ~170 roztočů na list koncem léta."
       },
       "mites_eriophyes_spring": {
         "description": "Při rašení kontrolovat hlavně starší dolní listy. Vlnovníkovec má až 7 generací.",
@@ -333,41 +345,40 @@
         "description": "V pozdním létě (zaměkání) označit keře s opakovaným silným výskytem. Na jaře před rašením je pak řešit."
       },
       "phomopsis_b": {
-        "description": "Kontrola kolem B (01). Napadené dřevo odstranit, rány ošetřit balzámem."
+        "description": "Kontrola ve stádiu vlny. Napadené dřevo odstranit, rány ošetřit balzámem."
       },
       "powdery_e": {
-        "description": "Kontrola padlí při E (3–4 listy). Infekce při vlhkosti nad 80 %, ovlhčení listů není nutné."
+        "description": "Kontrola padlí ve stádiu 3–4 listů. Infekce při vlhkosti nad 80 %, ovlhčení listů není nutné."
       },
       "moth_generation_1": {
-        "description": "1. generace obalečů: kontrola feromonovými lapáky mezi H a I. Housenky se líhnou ~7 dní po snůšce.",
+        "description": "1. generace obalečů: kontrola feromonovými lapáky od oddělení poupat do květu. Housenky se líhnou ~7 dní po snůšce.",
         "threshold": "Číselný práh není. Teploty nad 12–15 °C zvyšují aktivitu housenek."
       },
       "moth_generation_2": {
-        "description": "2. generace obalečů: kontrola kolem J (73). Housenky za 4–6 dní vnikají do bobulí."
+        "description": "2. generace obalečů: kontrola krátce po odkvětu, když mají bobule velikost broků. Housenky za 4–6 dní vnikají do bobulí."
       },
       "spider_mite_panonychus_dormant": {
         "description": "Kontrola dřeva při řezu: vajíčka na bázích pupenů. Přímá ochrana není potřeba ani možná.",
         "threshold": "Přes 80 % bází pupenů s vajíčky."
       },
       "spider_mite_panonychus_leaves": {
-        "description": "Kontrola listů ve stádiu 3 listů (E).",
-        "threshold": "Přes 70 % listů v E obsazeno."
+        "description": "Kontrola listů ve stádiu 3 listů.",
+        "threshold": "Přes 70 % listů obsazeno ve stádiu 3 listů."
       },
       "spider_mite_tetranychus": {
         "description": "Kontrola listů na roztoče od května do července.",
-        "threshold": "Květen–červen 30–40 % listů s roztoči; červenec–srpen 20–30 %. V ekologickém vinohradnictví přímá ochrana není možná.",
-        "note": "Kniha uvádí kalendář (květen–červenec), ne BBCH. Rozsah BBCH je přibližný."
+        "threshold": "Květen–červen 30–40 % listů s roztoči; červenec–srpen 20–30 %. V ekologickém vinohradnictví přímá ochrana není možná."
       },
       "leafhopper_yellow_traps": {
-        "description": "Žluté lepové desky ve stádiu F–H. Kontrola larev na listech."
+        "description": "Žluté lepové desky od objevení květenství do oddělení poupat. Kontrola larev na listech."
       },
       "leafhopper_generation_1": {
-        "description": "1. generace: kontrola larev na listech ve stádiu I.",
-        "threshold": "4–5 larev na list ve stádiu I (1. generace). Přímá ochrana většinou není nutná."
+        "description": "1. generace: kontrola larev na listech v době květu.",
+        "threshold": "4–5 larev na list v době květu (1. generace). Přímá ochrana většinou není nutná."
       },
       "leafhopper_generation_2": {
-        "description": "2. generace: kontrola larev na listech ve stádiu L.",
-        "threshold": "4–5 larev na list ve stádiu L (2. generace). Přímá ochrana většinou není nutná."
+        "description": "2. generace: kontrola larev na listech při uzavírání hroznů.",
+        "threshold": "4–5 larev na list při uzavírání hroznů (2. generace). Přímá ochrana většinou není nutná."
       }
     }
   },
