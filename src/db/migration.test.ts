@@ -108,6 +108,34 @@ describe('v3 migration: variety -> varietyId, regionProfile', () => {
       await upgraded.delete()
     }
   })
+
+  it('leaves a vineyard without a variety value without a varietyId', async () => {
+    const dbName = uniqueDbName()
+    const legacy = new LegacyDB(dbName)
+    await legacy.open()
+
+    const now = new Date().toISOString()
+    await legacy.table('vineyards').add({
+      name: 'No variety',
+      lat: 49.0,
+      lon: 17.0,
+      plantedYear: 2021,
+      createdAt: now,
+      updatedAt: now,
+    })
+    legacy.close()
+
+    const upgraded = new VinarDB(dbName)
+    await upgraded.open()
+
+    try {
+      const [vineyard] = await upgraded.vineyards.toArray()
+      expect(vineyard.varietyId).toBeUndefined()
+      expect(vineyard.regionProfile).toBe('cz-morava')
+    } finally {
+      await upgraded.delete()
+    }
+  })
 })
 
 /** Mirrors v1-v3 only, to seed a database as if it had never seen v4. */

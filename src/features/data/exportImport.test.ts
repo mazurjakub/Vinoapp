@@ -39,6 +39,34 @@ describe('export/import round trip', () => {
     ).toBe(false) // missing schemaVersion
   })
 
+  it('gives an event from an older export the active status', async () => {
+    const payload = await buildExportPayload()
+    const old = { vineyardId: VINEYARD_ID, date: '2026-05-01', disease: 'downy', type: 'primary', rule: 'test', createdAt: 'x', updatedAt: 'x' }
+    await importData({ ...payload, tables: { ...payload.tables, infectionEvents: [old as never] } })
+    try {
+      expect((await db.infectionEvents.toArray())[0].status).toBe('active')
+    } finally {
+      await db.infectionEvents.clear()
+    }
+  })
+
+  it('exports numbers with a decimal point, whatever the UI language', async () => {
+    const now = new Date().toISOString()
+    await db.vineyards.put({
+      id: VINEYARD_ID,
+      name: 'Export number test',
+      lat: 49.1,
+      lon: 17.2,
+      regionProfile: 'cz-morava',
+      varietyId: 1,
+      plantedYear: 2021,
+      createdAt: now,
+      updatedAt: now,
+    })
+    const json = JSON.stringify(await buildExportPayload())
+    expect(json).toContain('"lat":49.1')
+  })
+
   it('preserves vineyard data and a photo blob through export then import', async () => {
     const now = new Date().toISOString()
     await db.vineyards.put({
@@ -206,6 +234,19 @@ describe('export/import round trip', () => {
       .delete()
   })
 
+  it('round-trips user settings through export then import unchanged', async () => {
+    await db.settings.put({ key: 'sprayWarningDays', value: 7 })
+    const payload = await buildExportPayload()
+
+    await db.settings.where('key').equals('sprayWarningDays').delete()
+    expect(await db.settings.where('key').equals('sprayWarningDays').first()).toBeUndefined()
+
+    await importData(payload)
+
+    const restored = await db.settings.where('key').equals('sprayWarningDays').first()
+    expect(restored?.value).toBe(7)
+  })
+
   it('drops derived risk state and snapshots on import so the next sync rebuilds them', async () => {
     const now = new Date().toISOString()
     await db.dailyRisk.add({ vineyardId: VINEYARD_ID, date: '2026-05-01', source: 'forecast', meanTempC: 15 })
@@ -231,5 +272,35 @@ describe('export/import round trip', () => {
     expect(await db.dailyRisk.count()).toBe(0)
     expect(await db.settings.where('key').equals(`goidanichState:${VINEYARD_ID}:2026`).first()).toBeUndefined()
     expect(await db.settings.where('key').equals('sprayWarningDays').first()).toBeDefined()
+  })
+
+  it('discards a derived or unrecognized settings key present in the payload itself, same whitelist as export', async () => {
+    const now = new Date().toISOString()
+    const payload: ExportPayload = {
+      format: EXPORT_FORMAT,
+      schemaVersion: EXPORT_SCHEMA_VERSION,
+      exportedAt: now,
+      tables: {
+        vineyards: [],
+        varieties: [],
+        growthStages: [],
+        sprays: [],
+        works: [],
+        harvests: [],
+        infectionEvents: [],
+        settings: [
+          { key: 'sprayWarningDays', value: 10 },
+          // An old export made before the export whitelist existed, or a
+          // hand-edited file — either way, not something to import.
+          { key: `goidanichState:${VINEYARD_ID}:2026`, value: { state: {}, lastProcessedDate: '2026-05-01' } },
+          { key: 'someUnrecognizedKey', value: 'anything' },
+        ],
+      },
+    }
+    await importData(payload)
+
+    expect(await db.settings.where('key').equals('sprayWarningDays').first()).toBeDefined()
+    expect(await db.settings.where('key').equals(`goidanichState:${VINEYARD_ID}:2026`).first()).toBeUndefined()
+    expect(await db.settings.where('key').equals('someUnrecognizedKey').first()).toBeUndefined()
   })
 })
