@@ -6,24 +6,14 @@
 
 import { SETTINGS_KEYS } from './settingsKeys'
 
-/** Settings keys a user can actually set — the export whitelist (`features/data/exportRepo.ts`). */
+/** Settings the user can change, only these get exported. */
 export const USER_SETTINGS_KEYS: ReadonlySet<string> = new Set(Object.values(SETTINGS_KEYS))
 
-/**
- * Prefixes of settings keys holding state derived from weather and rules
- * (see `features/risk/syncSeasonState.ts` / `dailyAccumulator.ts`) — never
- * exported (`exportRepo.ts`), always stripped on import (`importRepo.ts`).
- */
+/** Derived state from the season sync, never exported or imported. */
 export const DERIVED_SETTINGS_KEY_PATTERN = /^(degreeSum|goidanichState|gublerThomasState|daySource|lastSeasonSync):/
 
 export type SettingsKeyClass = 'user' | 'derived' | 'unknown'
 
-/**
- * Classifies a `settings` row's key. `'unknown'` means neither this file nor
- * `exportRepo.ts`/`importRepo.ts` recognizes it — see
- * `settingsClassification.test.ts`, which fails if the app ever writes such
- * a key without this file being updated to classify it.
- */
 export function classifySettingsKey(key: string): SettingsKeyClass {
   if (USER_SETTINGS_KEYS.has(key)) return 'user'
   if (DERIVED_SETTINGS_KEY_PATTERN.test(key)) return 'derived'

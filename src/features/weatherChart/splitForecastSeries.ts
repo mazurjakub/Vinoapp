@@ -5,12 +5,8 @@
  */
 
 /**
- * Splits one series of values into a "measured" and a "forecast" half for
- * Recharts, so the same line can render solid up to today and dashed only
- * for the forecast part (Recharts has no per-segment dash, so this is the
- * standard two-overlapping-series trick). The two series share exactly one
- * point — the last measured index — so the line is visually continuous with
- * no gap and no doubly-drawn segment.
+ * Splits a series into measured and forecast parts, so the forecast can be dashed.
+ * Both parts share the last measured point, so the line stays continuous.
  */
 export interface SplitSeries {
   measured: (number | null)[]
@@ -28,11 +24,7 @@ export function splitForecastSeries(values: (number | null)[], boundaryIndex: nu
   }
 }
 
-/**
- * Splits a Goidanich series into two alternating series, one per cycle. The
- * percentage never falls within a cycle, so a fall between adjacent days means a
- * new cycle started right after the previous one ended, and the line must break there.
- */
+/** One series per Goidanich cycle, so the line breaks where a new cycle starts. */
 export function splitCycles(values: (number | null)[]): [(number | null)[], (number | null)[]] {
   const first: (number | null)[] = values.map(() => null)
   const second: (number | null)[] = values.map(() => null)

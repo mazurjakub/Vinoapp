@@ -32,11 +32,7 @@ function Swatch({ swatch }: { swatch: LegendSwatch }) {
   }
 }
 
-/**
- * Legend above a chart panel. Rendered as plain HTML rather than Recharts'
- * `<Legend>`, which draws every line series with a solid icon and so can't
- * tell the measured line apart from its dashed forecast continuation.
- */
+/** Plain HTML instead of Recharts' <Legend>, which can't show a dashed forecast line. */
 function ChartLegend({ items }: { items: LegendItem[] }) {
   return (
     <ul className="chart-legend">

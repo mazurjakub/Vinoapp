@@ -18,13 +18,8 @@ import { foldDays, type DailyAccumulatorRecord } from './dailyAccumulator'
 import { gublerStep, makeGoidanichStep } from './accumulatorSteps'
 
 /**
- * Computes the index values for days that are NOT in the persisted state yet
- * (today and the forecast, plus any elapsed days a sync hasn't reached), by
- * running the same engine steps from the last confirmed state. Nothing here is
- * written back: the result is for display only.
- *
- * Days without a value to show, such as those before activation, after a cycle
- * ended or after `isSeasonOver`, have no entry, so the caller shows `null`.
+ * Index values for days not in the stored state yet (today, forecast), computed with the
+ * same steps from the last stored state. Only for display, nothing is saved.
  */
 export function projectGoidanichPct(
   stored: DailyAccumulatorRecord<GoidanichCycleState> | undefined,

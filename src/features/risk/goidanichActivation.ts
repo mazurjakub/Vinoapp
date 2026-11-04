@@ -5,10 +5,8 @@
  */
 
 /**
- * The date the Goidanich index accumulates from, or `undefined` while it's
- * inactive. The index needs a primary 3-10 event this season. A downy spray
- * resets it, and it then stays inactive until a new primary event after that
- * spray, so it never restarts from the spray date itself.
+ * Date the Goidanich index runs from, `undefined` while inactive. It needs a primary event,
+ * and a downy spray turns it off until the next primary event after the spray.
  */
 export function resolveGoidanichActiveSince(
   primaryEventDates: string[],

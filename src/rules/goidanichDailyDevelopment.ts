@@ -51,25 +51,9 @@ function reachedStage(stages: GoidanichStage[], accumulatedPct: number): Goidani
 }
 
 /**
- * Daily downy mildew secondary-infection development, per the Goidanich
- * table transcribed by hand into `goidanich.json` (Pérez-Expósito et al.
- * 2017, VineSens, Table 1 — see that file's `_source`/`_notes`, including
- * three cells flagged as possibly suspicious and left exactly as
- * transcribed; do not "fix" the table here).
- *
- * Returns the percentage of infection development added for one day. The
- * paper labels the temperature "Average Temperature" and explains neither the
- * rounding nor the 0/25/50/75 sub-rows, so these two choices are this app's own:
- *
- * - Row: the mean rounded to the nearest whole degree, halves up, with no
- *   interpolation (12.46 °C uses row 12, 12.65 °C uses row 13).
- * - Stage: `accumulatedPct` as it was before this day's addition, rounded down
- *   to a quarter, read as the stage already reached.
- *
- * Below the table's lowest temperature (12 °C) development is 0; a mean of
- * exactly 12.0 °C uses row 12 (see `goidanichTableRowTempC`). From
- * `constantFromTempC` (25 °C) the paper states development is constant, so the
- * single row given for that case applies at any stage.
+ * Daily development (%) from the Goidanich table in goidanich.json (Pérez-Expósito et al. 2017).
+ * The paper doesn't say how to round, so the mean temperature is rounded to the nearest degree
+ * and the stage is the accumulated % rounded down to 25. From 25 °C the row is constant.
  */
 export function goidanichDailyDevelopment(meanTempC: number, rhPct: number, accumulatedPct: number): number {
   const rowTempC = goidanichTableRowTempC(meanTempC)

@@ -44,8 +44,7 @@ export class VinarDB extends Dexie {
       settings: '++id, &key',
     })
 
-    // v2: renamed `phenology` table to `growthStages` and `vineyards.vineCount`
-    // to `vineyards.vineHeadCount` to match the UI terminology ("růstová fáze").
+    // v2: phenology -> growthStages, vineCount -> vineHeadCount
     this.version(2)
       .stores({
         phenology: null,
@@ -68,10 +67,7 @@ export class VinarDB extends Dexie {
           })
       })
 
-    // v3: adds `varieties` and `infectionEvents`, and replaces the
-    // free-text `vineyards.variety` with `vineyards.varietyId` (FK into
-    // `varieties`, deduped by name) plus a `vineyards.regionProfile` guess
-    // based on coordinates. `vineHeadCount` is untouched (still used).
+    // v3: varieties table, variety -> varietyId, regionProfile guessed from coordinates
     this.version(3)
       .stores({
         varieties: '++id, &name',
@@ -113,9 +109,7 @@ export class VinarDB extends Dexie {
           })
       })
 
-    // v4: renames `harvests.sugarOe` to
-    // `harvests.sugar` + `harvests.sugarUnit`, so the unit travels with each
-    // record instead of being implied by the (changeable) app-wide setting.
+    // v4: sugarOe -> sugar + sugarUnit, the unit is stored with each record
     this.version(4).stores({}).upgrade(async (tx) => {
       await tx
         .table('harvests')
@@ -129,18 +123,15 @@ export class VinarDB extends Dexie {
         })
     })
 
-    // v5: per-day risk snapshots for the weather chart (see DailyRisk in schema.ts).
-    // Nothing to migrate: the table starts empty and the next sync fills it.
+    // v5: dailyRisk table, the next sync fills it
     this.version(5).stores({
       dailyRisk: '++id, &[vineyardId+date]',
     })
 
-    // v6: no data change. An older Goidanich state is replaced by the next
-    // successful sync (see GOIDANICH_ENGINE_VERSION), so it survives being offline.
+    // v6: no data change, the old Goidanich state is replaced by the next sync
     this.version(6).stores({})
 
-    // v7: infection events get a status, so one the data no longer supports is
-    // revoked instead of deleted. Every existing event stays active.
+    // v7: infection events get a status, existing ones are active
     this.version(7).stores({}).upgrade(async (tx) => {
       await tx
         .table('infectionEvents')

@@ -50,9 +50,7 @@ function VineyardForm({ initial, onSubmit, onCancel }: VineyardFormProps) {
   const [regionProfile, setRegionProfile] = useState<RegionProfileId>(
     initial?.regionProfile ?? defaultRegionProfileFor(parseDecimal(lat) ?? 0, parseDecimal(lon) ?? 0),
   )
-  // Once the user picks a profile explicitly, stop overwriting it on every
-  // coordinate change — otherwise typing lat/lon digit by digit would keep
-  // snapping the select back to the auto-guessed value.
+  // Once the user picks a profile, don't overwrite it when the coordinates change.
   const [regionManuallySet, setRegionManuallySet] = useState(Boolean(initial))
 
   const applyCoordinates = (nextLat: string, nextLon: string) => {

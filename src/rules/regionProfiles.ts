@@ -38,7 +38,7 @@ export interface SecondaryInfectionProfile {
    * it comes from an ambiguous diagram and isn't verified.
    */
   requireWetHours: boolean
-  /** Goidanich thresholds in %. The engine, the chart, its sentence, the Overview and the alerts all read these. */
+  /** Goidanich thresholds in %. */
   thresholdsPct: GoidanichThresholds
   /** Where the thresholds come from. */
   thresholdsSource: string

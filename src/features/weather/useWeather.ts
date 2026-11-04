@@ -27,9 +27,7 @@ export function useWeather(vineyard: Vineyard | undefined) {
     try {
       const hourly = await openMeteoProvider.fetchHourly(vineyard.lat, vineyard.lon)
       await saveWeatherCache(vineyard.id, hourly)
-      // The chart shows elapsed days from the stored `dailyRisk` snapshots,
-      // which only the season sync rewrites. Without this, those days would
-      // keep stale values until the Overview page (`useVineyardRisk`) ran it.
+      // The chart reads the dailyRisk snapshots, so run the sync after a refresh.
       const phenology = await getPhenologyDatesForYear(vineyard.id, new Date().getFullYear())
       await syncVineyardSeasonState(vineyard, phenology, hourly)
     } catch {

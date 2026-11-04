@@ -18,12 +18,7 @@ interface OpenMeteoResponse {
   }
 }
 
-/**
- * Days this recent are read from the forecast endpoint, older ones from
- * Historical Forecast, in the cache as well as in the season sync. Both serve the
- * same models; on 2026-10-31 they gave identical hourly values for the 12 days up
- * to that date.
- */
+/** Days this recent come from the forecast endpoint, older ones from Historical Forecast. */
 const FORECAST_RECENT_DAYS = 2
 
 /** A day with fewer valid hours counts as not returned by Historical Forecast, so the archive may fill it. */
@@ -69,11 +64,7 @@ async function runQuery(url: URL, source?: WeatherSource): Promise<HourlyWeather
   return parseResponse((await response.json()) as OpenMeteoResponse, source)
 }
 
-/**
- * The rolling cache follows the same rule as `fetchHourlyRange`, so a day has one
- * value everywhere. Without the older days the forecast is still worth having: they
- * stay out of the cache rather than coming from another source.
- */
+/** The cache uses the same split as fetchHourlyRange. If the older days fail, the forecast is still kept. */
 async function fetchHourly(lat: number, lon: number): Promise<HourlyWeather[]> {
   const today = localDateKey(new Date())
   const url = new URL(FORECAST_URL)
@@ -157,11 +148,8 @@ async function fetchPastDays(lat: number, lon: number, startDate: string, endDat
 }
 
 /**
- * Fetches a specific historical range (both dates inclusive, YYYY-MM-DD). The
- * endpoint depends only on the day's age, never on where the range starts: the
- * last `FORECAST_RECENT_DAYS` from the forecast endpoint, anything older from
- * Historical Forecast. A season stays on one set of models this way, unlike ERA5,
- * which gave a Goidanich cycle a different result than the forecast endpoint.
+ * Historical range, both dates inclusive. The endpoint depends only on the day's age, so a
+ * season stays on the same models (ERA5 gave different Goidanich results).
  */
 async function fetchHourlyRange(
   lat: number,

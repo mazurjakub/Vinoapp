@@ -22,11 +22,6 @@ import { localDateKey } from '../weather/format'
 import { saveWeatherCache } from '../weather/weatherCacheRepo'
 import { deleteVineyard } from '../vineyards/vineyardsRepo'
 
-/**
- * Dev-only: a dedicated vineyard so seeding/deleting the chart fixture can
- * never touch the user's real data. Never imported from a production code
- * path; see `DevFixtureButton.tsx`, which only renders in `import.meta.env.DEV`.
- */
 export const DEV_FIXTURE_VINEYARD_NAME = 'DEV fixture'
 
 /**
@@ -77,12 +72,7 @@ async function createDevVineyard(): Promise<number> {
   })) as number
 }
 
-/**
- * Seeds one of the chart states into the dedicated "DEV fixture" vineyard
- * (recreated each time) and selects it. The stored index values come from the
- * same engine steps as a real sync, and today and the forecast are left to the
- * chart's own projection, so the chart shows what it would show for real data.
- */
+/** Creates the DEV fixture vineyard with the given scenario and selects it. */
 export async function seedWeatherChartDevFixture(variant: DevFixtureVariant = 'active'): Promise<number> {
   await deleteWeatherChartDevFixture()
   const vineyardId = await createDevVineyard()
@@ -173,13 +163,7 @@ export async function seedWeatherChartDevFixture(variant: DevFixtureVariant = 'a
   return vineyardId
 }
 
-/**
- * Removes the DEV fixture vineyard and everything that belongs to it. No-op
- * if it doesn't exist. Goes through `deleteVineyard` — the same path the
- * app's own delete button uses — rather than its own partial copy, so a
- * fix to what counts as "everything" (see `vineyardsRepo.ts`) can't apply to
- * one and not the other.
- */
+/** Removes the DEV fixture vineyard, if there is one. */
 export async function deleteWeatherChartDevFixture(): Promise<void> {
   const vineyards = await db.vineyards.where('name').equals(DEV_FIXTURE_VINEYARD_NAME).toArray()
   for (const vineyard of vineyards) {

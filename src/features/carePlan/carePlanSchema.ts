@@ -92,10 +92,7 @@ function validateStage(raw: unknown, index: number, knownTargets: Set<string>): 
   }
 }
 
-/**
- * Validates the care-plan JSON once at load time. Throws on the first problem
- * so a broken data file is caught in tests / at startup, not silently rendered.
- */
+/** Throws on the first problem, so a broken data file is caught early. */
 export function parseCarePlan(value: unknown): CarePlan {
   if (typeof value !== 'object' || value === null) fail('plan: expected an object')
   const p = value as Record<string, unknown>

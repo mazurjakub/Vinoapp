@@ -118,12 +118,7 @@ export function advanceGublerThomasState(
   return { score, consecutiveQualifyingDays, ignited: true }
 }
 
-/**
- * `startingState`, when given, lets the caller resume a previously-persisted
- * run instead of restarting at zero — see `features/risk/syncSeasonState.ts`,
- * which accumulates this day by day so a short weather-cache window doesn't
- * lose the season's ignition/score history on every refresh.
- */
+/** `startingState` continues from a stored state instead of starting at zero. */
 export function powderyMildewGublerThomasRisk(
   hourly: HourlyWeather[],
   startingState: GublerThomasState = initialGublerThomasState(),

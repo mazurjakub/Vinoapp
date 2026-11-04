@@ -37,11 +37,7 @@ export async function deleteGrowthStage(id: number): Promise<void> {
   await db.growthStages.delete(id)
 }
 
-/**
- * Latest recorded date per stage for a vineyard in a given season. Without a
- * harvest stage, the last record from the harvest journal counts as the harvest,
- * because a harvest can be recorded in parts.
- */
+/** Latest date per stage in the season. Without a harvest stage, the last harvest record counts (harvest can be done in parts). */
 export async function getPhenologyDatesForYear(vineyardId: number, year: number): Promise<PhenologyDates> {
   const rows = await db.growthStages
     .where('vineyardId')

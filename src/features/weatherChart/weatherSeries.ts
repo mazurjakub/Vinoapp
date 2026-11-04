@@ -40,11 +40,7 @@ function datesBetween(from: string, to: string): string[] {
   return out
 }
 
-/**
- * Turns stored snapshots plus the in-memory projection into one row per day
- * in `[from, to]`. Pure: no database access, no index logic of its own. The
- * index values come only from the stored rows or from the engine's projection.
- */
+/** One row per day in [from, to], from stored snapshots and the projection. */
 export function buildWeatherSeries(input: BuildWeatherSeriesInput): WeatherPoint[] {
   const stored = new Map(input.storedRows.map((r) => [r.date, r]))
   const live = new Map(input.liveDays.map((d) => [d.date, d]))
@@ -61,13 +57,7 @@ export function buildWeatherSeries(input: BuildWeatherSeriesInput): WeatherPoint
       meanTempC: row?.meanTempC ?? (hasHours ? dailyMeanTemperature(hours) : null),
       precipitationMm: row?.precipitationMm ?? (hasHours ? dailyPrecipitation(hours) : null),
       meanRhPct: row?.meanRhPct ?? (hasHours ? hours.reduce((sum, h) => sum + h.relativeHumidity2m, 0) / hours.length : null),
-      // A stored row's index fields take precedence even when they're
-      // explicitly `null` (inactive) — only fall back to the in-memory
-      // projection when there's no stored row at all for this date (today,
-      // the forecast). `row?.x ?? projected` would be wrong here: `??` can't
-      // tell "no row" apart from "row, but null", so it would silently
-      // resurrect a projected value for a day the sync deliberately nulled
-      // out (e.g. the inactive gap right after a downy spray).
+      // A stored null means inactive, so `??` can't be used here.
       goidanichPct: row ? row.goidanichPct ?? null : (input.goidanichProjected.get(date) ?? null),
       gublerScore: row ? row.gublerScore ?? null : (input.gublerProjected.get(date) ?? null),
       primaryEvent: input.primaryEventDates.has(date),

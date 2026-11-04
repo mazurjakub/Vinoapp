@@ -4,8 +4,7 @@
  * Description: Converts photo blobs to and from base64 data URLs for export files.
  */
 
-// Uses btoa/atob (not FileReader or fetch(data:...)) so this works
-// identically in the browser and under Vitest's Node environment.
+// btoa/atob instead of FileReader, so it works in tests under Node too.
 
 function arrayBufferToBase64(buffer: ArrayBuffer): string {
   const bytes = new Uint8Array(buffer)

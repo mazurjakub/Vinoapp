@@ -85,10 +85,7 @@ export interface Harvest {
   date: string
   weightKg: number
   sugar?: number
-  /** Unit the `sugar` value was recorded in — stored per-record (not read from
-   * the app-wide setting) so changing the default unit later never silently
-   * reinterprets old numbers. Values are never converted between NM and Oe,
-   * because there's no verified formula for it. */
+  /** Stored per record, so changing the default unit doesn't change old values. NM and Oe are never converted. */
   sugarUnit?: SugarUnit
   notes?: string
   createdAt: string
@@ -117,10 +114,7 @@ export interface InfectionEvent {
   updatedAt: string
 }
 
-/** Which Open-Meteo endpoint served this hour — only set for backfilled
- * historical data (see `weather/openMeteoProvider.ts`); absent for the
- * regular rolling display cache, which always comes from the forecast
- * endpoint regardless of age. */
+/** Only set for backfilled historical data. */
 export type WeatherSource = 'historical-forecast' | 'archive' | 'forecast'
 
 export interface HourlyWeather {
@@ -132,11 +126,7 @@ export interface HourlyWeather {
   source?: WeatherSource
 }
 
-/**
- * One row per vineyard per elapsed day: the weather aggregates and the
- * engine's stored index values for that day. Derived data — not exported,
- * rebuilt by `syncVineyardSeasonState`. `null` index = not active yet.
- */
+/** One row per vineyard and elapsed day. Derived data, rebuilt by the sync. `null` = index not active. */
 export interface DailyRisk {
   id?: number
   vineyardId: number

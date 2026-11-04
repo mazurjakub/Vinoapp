@@ -11,23 +11,12 @@ import type { PhenologyDates, Risk, RiskReason, RiskResult } from './types'
 import { dailyMaxTemperature, dailyMeanTemperature, dailyMinTemperature, dailyPrecipitation, groupByDay } from './weatherMath'
 
 /**
- * `cz-morava` uses mean/min daily temperature + oospore maturity
- * (SET8,0) and ignores shoot length; `eu-generic` is the plain 3-10 model
- * (shoot ≥10 cm, daily max temperature ≥10 °C, 10 mm precipitation).
+ * cz-morava: mean/min temperature and oospore maturity (SET8,0), shoot length is ignored.
+ * eu-generic: the 3-10 rule (shoot 10 cm, max temperature 10 °C, 10 mm of rain).
+ * Rain is summed per calendar day, not over 24-48 h.
  *
- * Known simplification: precipitation is summed over the calendar day only,
- * not the 24–48 h rolling window the generic model allows for.
- *
- * `priorDegreeSum`, when given, is the oospore degree-day sum already
- * accumulated for every day *before* the first day in `hourly` — the caller
- * (see `features/risk/syncSeasonState.ts`) is expected to persist this
- * running total day by day, since `hourly` itself is only ever a short
- * rolling cache window and can't be trusted to span the whole season from
- * budbreak. Every day in `hourly` is then assumed to be new and gets added
- * on top. Without it, this falls back to summing degree-days from
- * `phenology.budbreak` using only what's present in `hourly` — correct only
- * when `hourly` itself already spans the whole season (as in tests), wrong
- * for a short weather-cache window in the real app.
+ * `priorDegreeSum` is the stored degree sum before the first day in `hourly`. Without it
+ * the sum is counted from budbreak using only `hourly`.
  */
 export function downyMildewPrimaryRisk(
   hourly: HourlyWeather[],

@@ -33,12 +33,7 @@ export interface FoldDaysResult<S> extends DailyAccumulatorRecord<S> {
   newlyProcessedDays: DayHours[]
 }
 
-/**
- * The day loop shared by the persisted sync and the in-memory projection.
- * Pure: it reads nothing and writes nothing. Days before `resetFromDate` and
- * days already covered by `start.lastProcessedDate` are skipped, so passing
- * overlapping `days` never double-counts.
- */
+/** The day loop shared by the sync and the projection. Skips days before resetFromDate and days already processed. */
 export function foldDays<S>(options: FoldDaysOptions<S>): FoldDaysResult<S> {
   const { resetFromDate, start, step, onDay } = options
   const sortedDays = [...options.days].sort((a, b) => a.date.localeCompare(b.date))
@@ -71,14 +66,10 @@ export interface SyncDailyAccumulatorOptions<S> {
   settingsKey: string
   resetFromDate: string
   initialState: S
-  /** All available *elapsed* days (any order; days before `resetFromDate` or already processed are skipped). */
+  /** Elapsed days, in any order. */
   days: DayHours[]
   step: DayStep<S>
-  /**
-   * Ignore whatever is stored and fold `days` from `resetFromDate` on. The
-   * stored record is still only overwritten at the end, so a failure part
-   * way through leaves the previous state in place.
-   */
+  /** Start again from resetFromDate. The stored record is only overwritten at the end. */
   fresh?: boolean
   /** Continue from the stored checkpoint instead of the stored state, folding the later days again. */
   fromCheckpoint?: boolean
@@ -89,16 +80,13 @@ export interface SyncDailyAccumulatorOptions<S> {
 }
 
 export interface SyncDailyAccumulatorResult<S> extends DailyAccumulatorRecord<S> {
-  /** Days that were actually folded into `state` by this call (empty if everything was already processed). */
+  /** Days actually processed by this call. */
   newlyProcessedDays: DayHours[]
 }
 
 /**
- * Generic persisted day-by-day accumulator. Resumes from whatever was
- * stored under `settingsKey` as long as `resetFromDate` matches what's
- * stored. A changed `resetFromDate` (a corrected budbreak date, or an earlier
- * primary-infection date found on reprocessing) means "start over from
- * scratch". Calling this repeatedly with overlapping `days` is always safe.
+ * Day-by-day accumulator stored under `settingsKey`. Continues from the stored state,
+ * a changed `resetFromDate` (e.g. a corrected budbreak date) starts over.
  */
 export async function syncDailyAccumulator<S>(
   options: SyncDailyAccumulatorOptions<S>,

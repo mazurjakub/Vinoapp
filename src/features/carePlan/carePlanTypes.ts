@@ -36,10 +36,9 @@ export interface CareStage {
   treatments: CareTreatment[]
 }
 
-/** Its texts are under `carePlanData.inspections.<id>` in the translations; thresholds are display text only. */
+/** Texts are in the translations under `carePlanData.inspections.<id>`. */
 export interface CareInspection {
   id: string
-  /** Id from `targets`. */
   target: string
   bbchFrom: string
   bbchTo: string

@@ -10,15 +10,7 @@ import { deleteWeatherChartDevFixture, seedWeatherChartDevFixture, type DevFixtu
 
 const VARIANTS: DevFixtureVariant[] = ['active', 'cold', 'offSeason']
 
-/**
- * Dev-only control: seeds (or removes) a synthetic spring/summer season into
- * a dedicated "DEV fixture" vineyard, so the chart's layout can be checked
- * against real variety (forecast boundary, a null Goidanich gap, a
- * Gubler-Thomas ramp) without a real weather fetch and without ever
- * touching the user's own vineyards. `import.meta.env.DEV` is replaced with
- * `false` in a production build, so Vite drops this whole component as dead
- * code — it never reaches the shipped bundle.
- */
+/** Dev only: fills a test vineyard with sample data to check the chart. Not in the production build. */
 function DevFixtureButton() {
   const { t } = useTranslation()
   const [busy, setBusy] = useState<DevFixtureVariant | 'delete' | null>(null)

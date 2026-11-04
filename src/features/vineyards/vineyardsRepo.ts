@@ -24,24 +24,12 @@ export async function updateVineyard(id: number, input: VineyardInput): Promise<
   await db.vineyards.update(id, { ...input, updatedAt: new Date().toISOString() })
 }
 
-/** Matches a derived settings key's vineyard-id segment exactly (e.g. `goidanichState:4:2026`
- * or `lastSeasonSync:4`) — never a substring of a different id, like `14`. */
+/** Matches the vineyard id exactly, so 1 doesn't match 14. */
 function belongsToVineyard(key: string, id: number): boolean {
   return new RegExp(`(^|:)${id}(:|$)`).test(key)
 }
 
-/**
- * Deletes a vineyard and everything keyed to it: every other table that has
- * a `vineyardId` column, plus any derived `settings` row for it (the index
- * accumulators, source log, last-sync result — see
- * `features/risk/syncSeasonState.ts`). If `selectedVineyardId` currently
- * points at this vineyard, it's cleared too, so the app doesn't keep
- * pointing at a vineyard that no longer exists.
- *
- * This is the single path for removing a vineyard — the dev fixture's
- * delete button calls this too (see `devFixture.ts`), rather than keeping
- * its own partial copy that can drift out of sync with this one.
- */
+/** Deletes a vineyard with all its rows and derived settings, and clears the selection if needed. */
 export async function deleteVineyard(id: number): Promise<void> {
   await db.transaction(
     'rw',

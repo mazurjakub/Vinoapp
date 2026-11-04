@@ -10,7 +10,7 @@ import { classifySettingsKey } from '../../db/settingsClassification'
 import { dataUrlToBlob } from './blobCodec'
 import { EXPORT_FORMAT, type ExportPayload } from './exportRepo'
 
-/** Normalizes a harvest record from an older export (pre-schemaVersion-1 `sugarOe` field). */
+/** Older exports have `sugarOe` instead of sugar + sugarUnit. */
 function normalizeHarvest(raw: Harvest & { sugarOe?: number }): Harvest {
   if (raw.sugarOe === undefined) return raw
   const { sugarOe, ...rest } = raw
@@ -37,13 +37,7 @@ export function isExportPayload(value: unknown): value is ExportPayload {
   return requiredKeys.every((key) => Array.isArray(tables[key]))
 }
 
-/**
- * Replaces all local data with the contents of `payload`. Destructive —
- * callers must confirm with the user before calling this (see
- * `DataExportImport.tsx`). Vineyard/record ids from the export are
- * preserved, so cross-table references (e.g. `settings.selectedVineyardId`)
- * stay consistent after import.
- */
+/** Replaces all local data with the payload. Ids are kept so references between tables still work. */
 export async function importData(payload: ExportPayload): Promise<void> {
   const works: Work[] = await Promise.all(
     payload.tables.works.map(async ({ photoBlob, ...rest }) => ({
@@ -85,13 +79,7 @@ export async function importData(payload: ExportPayload): Promise<void> {
       // Exports from before event statuses have no `status`.
       await db.infectionEvents.bulkAdd(payload.tables.infectionEvents.map((e) => ({ ...e, status: e.status ?? 'active' })))
 
-      // Same whitelist as the export (`exportRepo.ts`): only settings
-      // classified 'user' are imported. Derived state (index accumulators,
-      // source log, last sync result) from an older export that still had
-      // it, and any unrecognized key, are both discarded rather than
-      // imported — the next sync rebuilds derived state from the data above
-      // so it matches the imported inputs, and an unknown key is never
-      // silently kept around.
+      // Only user settings, derived state is rebuilt by the next sync.
       const importableSettings = payload.tables.settings.filter((s) => classifySettingsKey(s.key) === 'user')
       await db.settings.bulkAdd(importableSettings)
       await db.dailyRisk.clear()

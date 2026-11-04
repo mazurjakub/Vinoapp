@@ -167,10 +167,7 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
   const today = localDateKey(new Date())
   const from = addDaysUTC(today, -WINDOW_DAYS)
   const to = addDaysUTC(today, WINDOW_DAYS)
-  // The day the synced cursor is on, shared by all three panels (same
-  // syncId) and shown in the fixed row above them — set on hover/click/touch,
-  // never cleared on mouse-leave so a tapped day stays selected until another
-  // one is touched.
+  // Selected day, shared by all three panels. Not cleared on mouse leave, so a tapped day stays.
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
 
   const vineyard = useLiveQuery(() => db.vineyards.get(vineyardId), [vineyardId])
@@ -326,10 +323,7 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
       padding={{ left: 8, right: 8 }}
     />
   )
-  // Panels with a single Y axis use Recharts' default id ("0") and don't
-  // need to say so; the precip+temp panel has two explicitly-id'd axes, and
-  // a reference component with neither matches none of them — Recharts then
-  // can't resolve a vertical extent to draw against and silently omits it.
+  // The precip+temp panel has two Y axes with ids, reference components there need yAxisId or Recharts skips them.
   const forecastBand = (showLabel: boolean, yAxisId?: string) =>
     forecastFrom && (
       <ReferenceArea
@@ -359,10 +353,7 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
       }
     />
   )
-  // No floating box (`content={() => null}`) — just the synced vertical
-  // cursor line (`cursor`), shared across all three panels via `syncId`. The
-  // selected day's values show in the fixed `DaySummary` row above the
-  // panels instead, so nothing ever overlaps the plot.
+  // No tooltip box, just the cursor line. The values are shown in DaySummary.
   const cursorTooltip = <Tooltip content={() => null} cursor={{ stroke: 'var(--chart-muted)', strokeOpacity: 0.6 }} />
 
   // The line stops at the season end. Each label sits just above its own line at the right end,
@@ -512,10 +503,7 @@ function WeatherChart({ vineyardId }: { vineyardId: number }) {
       : []),
   ]
 
-  // Recharts passes its internal chart state (not a DOM event) to these.
-  // Touch is handled the same way — Recharts maps touchmove to the same
-  // active-index tracking as mousemove — and nothing clears the selection on
-  // mouse-leave/touch-end, so a tapped day stays shown until another is touched.
+  // Recharts passes its chart state here, not a DOM event. Touch works the same way.
   const handleChartActivity = (state: { activeTooltipIndex?: number | string | null }) => {
     const index = Number(state?.activeTooltipIndex)
     if (Number.isInteger(index)) setActiveIndex(index)

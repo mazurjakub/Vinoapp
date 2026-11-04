@@ -15,12 +15,7 @@ import {
   type GublerThomasState,
 } from '../../rules'
 
-/**
- * The single place where a day is folded into the Goidanich and
- * Gubler-Thomas indices. Both the persisted sync (`syncSeasonState.ts`) and
- * the in-memory projection for forecast days (`riskProjection.ts`) call these,
- * so the chart can never disagree with the stored values.
- */
+/** Used by both the sync and the forecast projection, so the chart matches the stored values. */
 export function makeGoidanichStep(options: GoidanichCycleOptions) {
   return (state: GoidanichCycleState, day: DayHours): GoidanichCycleState =>
     advanceGoidanichCycle(state, day, options).state

@@ -45,7 +45,6 @@ const gublerThomasKey = (vineyardId: number, year: number) => `gublerThomasState
 /** Written by older versions, whose seasons were computed from ERA5. Its presence asks for one replay. */
 const legacySourceLogKey = (vineyardId: number, year: number) => `daySource:${vineyardId}:${year}`
 
-/** Prepends a fetched historical range to `cachedDays` if `neededFrom` predates what's already cached. */
 async function ensureHistoricalCoverage(
   vineyard: Vineyard,
   neededFrom: string,
@@ -78,19 +77,9 @@ interface SyncWindow {
 }
 
 /**
- * Resolves which days an accumulator should fold this call.
- *
- * Window path: the state reaches into the recomputed days, so continue from the
- * checkpoint before them with the fresh download. Days that left the window
- * since the last sync are fetched too, because they were never made final.
- *
- * Normal path: resume from `lastProcessedDate + 1` and fetch any gap. Also used
- * offline, where finished days just stay as they are.
- *
- * Rebuild path: recompute from `resetFromDate` with fresh data. Also for a state
- * stored before checkpoints existed. The stored state is NOT deleted here. The
- * fetch happens first; if it fails the old state stays, and the caller overwrites
- * it only after the recomputation finishes (`fresh: true`).
+ * Decides which days to process. Normally continues after lastProcessedDate. Days in the
+ * recompute window are processed again from the checkpoint with fresh data. A fresh run
+ * recomputes from resetFromDate, the old state is overwritten only after it succeeds.
  */
 async function prepareSyncDays(
   vineyard: Vineyard,
@@ -149,29 +138,10 @@ export interface SyncSeasonStateResult {
 const lastSyncKey = (vineyardId: number) => `lastSeasonSync:${vineyardId}`
 
 /**
- * Keeps the season-long, cumulative parts of the rule engine (SET8,0 degree
- * sum, the Goidanich secondary index, and the Gubler-Thomas index) correct
- * even though the weather cache itself only ever holds a short rolling
- * window. Safe to call repeatedly: only the last `RECOMPUTED_DAYS` are folded
- * again, from a fresh download and from the state before them, and older days
- * stay as they are (see `syncDailyAccumulator`).
- *
- * Only *elapsed* days (strictly before today) are folded into the persisted
- * state. Today and the forecast are computed in memory for display only
- * (see `riskProjection.ts`) and never stored as state.
- *
- * Each section is independent: if a historical-fetch network call fails, that
- * section's persisted state stays exactly as it was, and the others still
- * sync. Failures are listed in `failedSections` and surfaced through
- * `lastSeasonSync:{vineyardId}`.
- *
- * Per-day snapshots (`dailyRisk`) are written next to the accumulators. They
- * hold each elapsed day's weather aggregates, its source
- * and the Goidanich / Gubler-Thomas values the engine stored for that day.
- * Snapshots are written only after a section finishes successfully. A forced
- * recompute overwrites the affected days, and a day that isn't active yet keeps
- * `null` instead of 0.
- *
+ * Keeps the season state (SET8,0, Goidanich, Gubler-Thomas) up to date, even though the
+ * weather cache only holds a few days. Only elapsed days are stored, today and the forecast
+ * are computed for display. If a download fails, that part keeps its old state and is
+ * reported in `failedSections`.
  */
 async function runSeasonSync(
   vineyard: Vineyard,
@@ -192,7 +162,6 @@ async function runSeasonSync(
   // Every elapsed day seen this call (cache + anything fetched), for the weather part of the snapshots.
   const elapsedByDate = new Map<string, DayHours>(elapsedCachedDays.map((d) => [d.date, d]))
   const addElapsed = (days: DayHours[]) => days.forEach((d) => elapsedByDate.set(d.date, d))
-  // Snapshot patches collected from sections that finished successfully.
   const snapshotPatches = new Map<string, DailyRiskPatch>()
   const patchFor = (date: string): DailyRiskPatch => {
     const existing = snapshotPatches.get(date) ?? { date }
@@ -219,11 +188,10 @@ async function runSeasonSync(
 
   const legacyKey = legacySourceLogKey(vineyard.id, year)
   const legacySource = (await getSetting(legacyKey)) !== undefined
-  // A missing snapshot history (first run after the dailyRisk table was added,
-  // or after an import) forces a replay too, so the chart has the past days.
+  // Missing snapshots (new table or after an import) force a replay too.
   const rebuildAll = legacySource || (await db.dailyRisk.where('vineyardId').equals(vineyard.id).count()) === 0
 
-  // 1) SET8,0 oospore degree-day sum. No snapshot columns; it only feeds the primary-infection events.
+  // 1) SET8,0 degree-day sum
   if (phenology.budbreak) {
     try {
       const key = degreeSumKey(vineyard.id, year, vineyard.regionProfile)
@@ -239,9 +207,7 @@ async function runSeasonSync(
         rebuildAll,
       )
       addElapsed(prepared.days)
-      // The primary-event check needs the degree-sum as of the day before the first day folded
-      // now. After a fresh recompute that's the season start (0), not the stored season total,
-      // otherwise the sum is counted twice.
+      // Degree sum as of the day before the first processed day (0 after a fresh recompute).
       const storedSum = priorSumBeforeSync?.resetFromDate === phenology.budbreak ? priorSumBeforeSync : undefined
       const priorSum = prepared.fresh
         ? 0
@@ -260,7 +226,7 @@ async function runSeasonSync(
         step: (sum, day) => sum + Math.max(0, dailyMeanTemperature(day.hours) - profile.primaryInfection.oosporeDegreeSumBaseC),
       })
 
-      // 2) Detect + durably record new primary-infection events among the newly folded days.
+      // 2) Record new primary infection events
       if (result.newlyProcessedDays.length > 0) {
         const gapHourly = result.newlyProcessedDays.flatMap((d) => d.hours)
         const gapResults = downyMildewPrimaryRisk(gapHourly, phenology, profile, priorSum)
@@ -272,11 +238,7 @@ async function runSeasonSync(
     }
   }
 
-  // 3) Goidanich secondary index, active from the earliest primary event this
-  // season that isn't superseded by a later downy-targeted spray. Logging such
-  // a spray deactivates the index until a
-  // NEW primary event dated after that spray — a changed `resetFromDate` then
-  // restarts the accumulator from that new event, not from the spray date.
+  // 3) Goidanich, from the first primary event that isn't followed by a downy spray
   const seasonPrimaryEvents = await db.infectionEvents
     .where('vineyardId')
     .equals(vineyard.id)
@@ -339,8 +301,7 @@ async function runSeasonSync(
     }
   }
 
-  // 4) Gubler-Thomas powdery mildew index, anchored at budbreak (or Jan 1st if
-  // budbreak isn't recorded), or at the latest powdery spray after that.
+  // 4) Gubler-Thomas, from budbreak (or 1 Jan) or the last powdery spray
   try {
     const latestPowderySprayDate = (
       await db.sprays
@@ -382,10 +343,7 @@ async function runSeasonSync(
     failedSections.push('gublerThomas')
   }
 
-  // Goidanich is inactive for any elapsed day after the latest downy spray
-  // and before `goidanichActiveSince` (or indefinitely, if there's no eligible
-  // event yet) — null those snapshot days explicitly, since they may still
-  // hold a non-null value written before the spray reset the index.
+  // Days after a downy spray and before the next event have no Goidanich value, clear old ones.
   if (latestDownySprayDate) {
     for (const date of elapsedByDate.keys()) {
       if (date > latestDownySprayDate && (!goidanichActiveSince || date < goidanichActiveSince)) {
@@ -446,11 +404,7 @@ async function syncInputs(vineyard: Vineyard, phenology: PhenologyDates, cachedH
   })
 }
 
-/**
- * Runs the sync with a per-plot lock. While one runs, another call doesn't start
- * alongside it: all calls in the meantime share one further run after it finishes,
- * with the latest arguments.
- */
+/** Only one sync per plot at a time. Calls in the meantime share one more run afterwards. */
 export function syncVineyardSeasonState(
   vineyard: Vineyard,
   phenology: PhenologyDates,
@@ -484,11 +438,7 @@ export function syncVineyardSeasonState(
   return finished
 }
 
-/**
- * For a caller that reacts to data changing, such as opening the Overview: does
- * nothing if the last successful sync already saw the same data, so a weather
- * refresh isn't followed by a second run. Returns `undefined` when skipped.
- */
+/** Skips the sync if nothing changed since the last successful one. */
 export async function syncVineyardSeasonStateOnce(
   vineyard: Vineyard,
   phenology: PhenologyDates,

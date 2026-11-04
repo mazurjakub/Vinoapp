@@ -12,10 +12,8 @@ export type CurrentPhase = GrowthStageType | 'none'
 export type RowStatus = 'past' | 'current' | 'upcoming'
 
 /**
- * Rough mapping from the app's growth stages to the rows of the care plan,
- * matched by each row's `bbchFrom`. The app has only one "flowering" stage, so it covers
- * the rows both before and right after flowering (❸, ❹, ❺); ❻ and ❼ are
- * shown as upcoming until veraison is recorded.
+ * Rough mapping from growth stages to care plan rows (by `bbchFrom`). The app has only one
+ * flowering stage, so it covers rows ❸–❺.
  */
 const CURRENT_BBCH_BY_PHASE: Record<CurrentPhase, string[]> = {
   none: ['01'],
@@ -45,11 +43,7 @@ export function pickCurrentPhase(entries: GrowthStageEntry[], today: string, sea
   return latest[latest.length - 1].stage
 }
 
-/**
- * Index of the stage row an inspection belongs to: the first row whose
- * `bbchFrom` falls inside the inspection's BBCH range; if none does, the last
- * row that starts before it. Returns -1 only if no row starts before it.
- */
+/** First row whose `bbchFrom` is inside the inspection's BBCH range, otherwise the last row before it. */
 export function inspectionRowIndex(inspection: CareInspection, stages: CareStage[]): number {
   const from = Number(inspection.bbchFrom)
   const to = Number(inspection.bbchTo)
@@ -66,11 +60,7 @@ export function inspectionRowIndex(inspection: CareInspection, stages: CareStage
   return lastBefore
 }
 
-/**
- * Status per row, in plan order. Rows before the current phase are `past`,
- * rows after it are `upcoming`. For ripening/harvest there are no current
- * rows left, so everything is `past`.
- */
+/** past / current / upcoming for each row of the plan. */
 export function rowStatuses(stages: CareStage[], phase: CurrentPhase): RowStatus[] {
   const currentIdx = stages
     .map((s, i) => (CURRENT_BBCH_BY_PHASE[phase].includes(s.bbchFrom) ? i : -1))

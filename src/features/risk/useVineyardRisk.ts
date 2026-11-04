@@ -32,7 +32,6 @@ import { resolveGoidanichActiveSince } from './goidanichActivation'
 import { syncVineyardSeasonStateOnce, type SyncSeasonStateResult } from './syncSeasonState'
 import type { DailyAccumulatorRecord } from './dailyAccumulator'
 
-/** Only the hours from `fromDateInclusive` onward (display window for whatever hasn't been persisted yet). */
 function filterHourlyFrom(hourly: HourlyWeather[], fromDateInclusive: string): HourlyWeather[] {
   return hourly.filter((h) => h.time.slice(0, 10) >= fromDateInclusive)
 }
@@ -76,9 +75,7 @@ export function useVineyardRisk(vineyardId: number | undefined) {
     lastDownySprayDatetime?.slice(0, 10),
   )
 
-  // Persisted, season-long state for the three cumulative rules — read
-  // reactively so the display updates once `syncVineyardSeasonState` (below)
-  // writes new data.
+  // Stored season state, updates when the sync writes.
   const degreeSumRecord = useLiveQuery(
     () =>
       vineyard
@@ -97,11 +94,7 @@ export function useVineyardRisk(vineyardId: number | undefined) {
     () => (vineyard ? getSetting<DailyAccumulatorRecord<GublerThomasState>>(`gublerThomasState:${vineyard.id}:${year}`) : undefined),
     [vineyard?.id, year],
   )
-  // Whether the last attempt to sync season-long state (SET8,0, Goidanich,
-  // Gubler-Thomas) against Open-Meteo actually succeeded — surfaced so the UI
-  // can warn that the displayed risk may be based on incomplete history
-  // instead of silently looking current when it isn't (a network error here
-  // never changes any already-persisted state, see syncVineyardSeasonState).
+  // Whether the last sync succeeded, so the UI can warn about incomplete data.
   const lastSeasonSync = useLiveQuery(
     () => (vineyard ? getSetting<SyncSeasonStateResult>(`lastSeasonSync:${vineyard.id}`) : undefined),
     [vineyard?.id],
@@ -119,9 +112,7 @@ export function useVineyardRisk(vineyardId: number | undefined) {
 
     const profile = REGION_PROFILES[vineyard.regionProfile]
 
-    // Primary: start from the persisted degree-sum (as of its lastProcessedDate)
-    // and only layer today + the forecast on top for display — never
-    // re-summing days already folded into the persisted total.
+    // Stored degree sum, with today and the forecast on top.
     const primaryFrom = degreeSumRecord?.lastProcessedDate
       ? addDaysUTC(degreeSumRecord.lastProcessedDate, 1)
       : (phenology.budbreak ?? '0000-01-01')
@@ -132,9 +123,7 @@ export function useVineyardRisk(vineyardId: number | undefined) {
       degreeSumRecord?.state,
     )
 
-    // Only trust the stored record if it was computed from the same
-    // activation date — a stale one (from before a spray deactivated the
-    // index, with a sync still pending) must not leak into the display.
+    // Ignore a stored record from a different activation date (e.g. from before a spray).
     const matchingGoidanichRecord =
       goidanichRecord?.resetFromDate === goidanichActiveSince ? goidanichRecord : undefined
     const secondary = goidanichActiveSince
@@ -186,10 +175,7 @@ export function useVineyardRisk(vineyardId: number | undefined) {
     year,
   ])
 
-  // Keeps the persisted season-long state (SET8,0 sum, Goidanich index,
-  // Gubler-Thomas index, and recorded infection events) up to date. Skipped
-  // when nothing changed since the last sync, such as right after a weather
-  // refresh already ran it (see syncVineyardSeasonStateOnce).
+  // Sync the season state, skipped when nothing changed.
   useEffect(() => {
     if (vineyard && phenology && cache) {
       void syncVineyardSeasonStateOnce(vineyard, phenology, cache.hourly)

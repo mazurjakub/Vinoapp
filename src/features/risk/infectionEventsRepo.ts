@@ -12,13 +12,7 @@ export function isActiveInfectionEvent(event: InfectionEvent): boolean {
   return event.status !== 'revoked'
 }
 
-/**
- * Upserts one `infectionEvents` row per newly-detected primary downy mildew
- * day in `results` (deduped by date). Weather cache only holds a rolling
- * ~14-day window, so calling this after every forecast refresh is what lets
- * the season-long event count in Dexie accumulate over time. A revoked event
- * whose day qualifies again becomes active again.
- */
+/** Saves one event per new high-risk primary day. A revoked event that qualifies again becomes active. */
 export async function recordPrimaryInfectionEvents(
   vineyardId: number,
   results: RiskResult[],
@@ -57,10 +51,7 @@ export async function recordPrimaryInfectionEvents(
   }
 }
 
-/**
- * Revokes events the rule itself recorded on days that no longer qualify after
- * their weather was downloaded again. An event entered another way stays active.
- */
+/** Revokes events recorded by the rule on days that no longer qualify after a new download. Manual ones stay. */
 export async function revokeUnconfirmedPrimaryEvents(vineyardId: number, results: RiskResult[]): Promise<void> {
   const unconfirmed = new Set(results.filter((r) => r.risk !== 'high' && r.rule.startsWith('downy-primary')).map((r) => r.date))
   const now = new Date().toISOString()

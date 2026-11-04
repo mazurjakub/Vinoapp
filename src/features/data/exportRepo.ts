@@ -42,13 +42,7 @@ export interface ExportPayload {
   }
 }
 
-/**
- * Everything the user entered, plus their own settings. Excludes
- * `weatherCache` and `dailyRisk` (re-fetchable/derived, not worth exporting)
- * and any `settings` row not classified `'user'` by `classifySettingsKey`
- * (derived rule-engine state, which the next sync rebuilds from the data
- * above after an import — see settingsClassification.ts).
- */
+/** Everything the user entered. Weather cache, snapshots and derived settings are left out, the next sync rebuilds them. */
 export async function buildExportPayload(): Promise<ExportPayload> {
   const [vineyards, varieties, growthStages, sprays, rawWorks, harvests, infectionEvents, settings] =
     await Promise.all([
