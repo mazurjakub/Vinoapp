@@ -102,8 +102,8 @@ export function useVineyardRisk(vineyardId: number | undefined) {
     [vineyardId, year],
   )
   const powderySprayAnchors = useLiveQuery(
-    () => (vineyardId ? getSprayIntervalAnchors(vineyardId, year, 'powdery') : undefined),
-    [vineyardId, year],
+    () => (vineyardId ? getSprayIntervalAnchors(vineyardId, year, 'powdery', phenology?.budbreak) : undefined),
+    [vineyardId, year, phenology?.budbreak],
   )
   // Whether the last sync succeeded, so the UI can warn about incomplete data.
   const lastSeasonSync = useLiveQuery(

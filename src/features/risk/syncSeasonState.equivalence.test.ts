@@ -78,6 +78,7 @@ const withoutId = (row: DailyRisk) => ({
   meanRhPct: row.meanRhPct,
   goidanichPct: row.goidanichPct,
   gublerScore: row.gublerScore,
+  powderyFavorableDay: row.powderyFavorableDay,
 })
 
 const CONTINUOUS_ID = 700000001

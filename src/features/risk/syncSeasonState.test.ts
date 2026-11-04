@@ -66,6 +66,7 @@ async function cleanup() {
     `degreeSum:${VINEYARD_ID}:${year}:cz-morava`,
     `goidanichState:${VINEYARD_ID}:${year}`,
     `gublerThomasState:${VINEYARD_ID}:${year}`,
+    `powderyFavorable:${VINEYARD_ID}:${year}`,
     `lastSeasonSync:${VINEYARD_ID}`,
     `daySource:${VINEYARD_ID}:${year}`,
   ]
@@ -705,5 +706,31 @@ describe('syncVineyardSeasonState', () => {
     expect(degreeSumAfter!.state).toBeGreaterThanOrEqual(degreeSumBefore!.state)
     expect(eventsAfter).toBe(eventsBefore)
     expect(gublerAfter?.state.ignited).toBe(gublerBefore?.state.ignited)
+  })
+
+  it('stores the powdery favourable days from the season start, also before a powdery spray', async () => {
+    const vineyard = makeVineyard()
+    await db.dailyRisk.where('vineyardId').equals(VINEYARD_ID).delete()
+    const now = new Date().toISOString()
+    await db.sprays.add({
+      vineyardId: VINEYARD_ID,
+      datetime: `${year}-04-02T08:00`,
+      product: 'Powdery treatment',
+      activeSubstance: 'test',
+      dose: '1 kg/ha',
+      target: 'powdery',
+      createdAt: now,
+      updatedAt: now,
+    })
+
+    await syncVineyardSeasonState(vineyard, { budbreak }, [
+      ...hourlyForDay(`${year}-04-01`, 25),
+      ...hourlyForDay(`${year}-04-02`, 15),
+      ...hourlyForDay(`${year}-04-03`, 25),
+      ...hourlyForDay(`${year}-04-04`, 25).slice(0, 10),
+    ])
+
+    const rows = await listDailyRiskWindow(VINEYARD_ID, `${year}-04-01`, `${year}-04-04`)
+    expect(rows.map((r) => r.powderyFavorableDay)).toEqual([true, false, true, null])
   })
 })

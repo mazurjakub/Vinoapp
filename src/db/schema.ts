@@ -137,6 +137,8 @@ export interface DailyRisk {
   meanRhPct?: number
   goidanichPct?: number | null
   gublerScore?: number | null
+  /** Powdery mildew conditions of the day, independent of the index and of sprays. `null` = too few hours of data. */
+  powderyFavorableDay?: boolean | null
 }
 
 export interface WeatherCache {

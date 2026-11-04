@@ -23,6 +23,7 @@ describe('classifySettingsKey', () => {
     expect(classifySettingsKey('degreeSum:1:2026:cz-morava')).toBe('derived')
     expect(classifySettingsKey('goidanichState:1:2026')).toBe('derived')
     expect(classifySettingsKey('gublerThomasState:1:2026')).toBe('derived')
+    expect(classifySettingsKey('powderyFavorable:1:2026')).toBe('derived')
     expect(classifySettingsKey('daySource:1:2026')).toBe('derived')
     expect(classifySettingsKey('lastSeasonSync:1')).toBe('derived')
   })

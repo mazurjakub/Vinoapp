@@ -82,6 +82,13 @@ export function dayQualifies(hours: HourlyWeather[]): boolean {
   return longestConsecutiveRun(hours, inTemperatureWindow) >= GUBLER_THOMAS.MIN_CONSECUTIVE_HOURS
 }
 
+/** Same limit as for Goidanich, a day with fewer hours can't be judged. */
+export const POWDERY_MIN_HOURS_PER_DAY = 18
+
+export function powderyFavorableDay(hours: HourlyWeather[]): boolean | null {
+  return hours.length < POWDERY_MIN_HOURS_PER_DAY ? null : dayQualifies(hours)
+}
+
 export function dayIsHot(hours: HourlyWeather[]): boolean {
   return hours.some((h) => h.temperature2m >= GUBLER_THOMAS.HOT_TEMPERATURE_C)
 }

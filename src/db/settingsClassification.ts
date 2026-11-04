@@ -10,7 +10,7 @@ import { SETTINGS_KEYS } from './settingsKeys'
 export const USER_SETTINGS_KEYS: ReadonlySet<string> = new Set(Object.values(SETTINGS_KEYS))
 
 /** Derived state from the season sync, never exported or imported. */
-export const DERIVED_SETTINGS_KEY_PATTERN = /^(degreeSum|goidanichState|gublerThomasState|daySource|lastSeasonSync):/
+export const DERIVED_SETTINGS_KEY_PATTERN = /^(degreeSum|goidanichState|gublerThomasState|powderyFavorable|daySource|lastSeasonSync):/
 
 export type SettingsKeyClass = 'user' | 'derived' | 'unknown'
 

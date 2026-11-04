@@ -5,14 +5,22 @@
  */
 
 import { db } from '../../db'
-import { addDaysUTC, daysBetween, secondarySeasonEnded, type RiskReason, type RiskResult } from '../../rules'
+import type { DailyRisk } from '../../db/schema'
+import {
+  addDaysUTC,
+  daysBetween,
+  GUBLER_THOMAS,
+  secondarySeasonEnded,
+  type RiskReason,
+  type RiskResult,
+} from '../../rules'
 import { isActiveInfectionEvent } from './infectionEventsRepo'
 
 export type SprayIntervalDisease = 'downy' | 'powdery'
 
 export interface SprayIntervalAnchors {
   lastSprayDate?: string
-  /** First active infection event, for powdery mildew the natural Gubler-Thomas ignition. */
+  /** First active infection event, for powdery mildew the end of the first run of 3 favourable days. */
   firstInfectionDate?: string
 }
 
@@ -33,6 +41,7 @@ export async function getSprayIntervalAnchors(
   vineyardId: number,
   year: number,
   disease: SprayIntervalDisease,
+  budbreak?: string,
 ): Promise<SprayIntervalAnchors> {
   const prefix = String(year)
   const sprays = await db.sprays
@@ -51,15 +60,26 @@ export async function getSprayIntervalAnchors(
     return { lastSprayDate, firstInfectionDate: events[0]?.date }
   }
 
-  // A spray leaves the index started, so only an ignition on or before the first spray is natural.
-  const ignited = await db.dailyRisk
+  // Without a budbreak date warm days in April would start the countdown before there are any leaves.
+  if (!budbreak) return { lastSprayDate }
+  const rows = await db.dailyRisk
     .where('[vineyardId+date]')
-    .between([vineyardId, `${prefix}-01-01`], [vineyardId, `${prefix}-12-31`], true, true)
-    .and((row) => row.gublerScore !== null && row.gublerScore !== undefined)
-    .first()
-  const firstSprayDate = sprays[0]?.datetime.slice(0, 10)
-  const natural = ignited && (!firstSprayDate || ignited.date <= firstSprayDate)
-  return { lastSprayDate, firstInfectionDate: natural ? ignited.date : undefined }
+    .between([vineyardId, budbreak], [vineyardId, `${prefix}-12-31`], true, true)
+    .toArray()
+  return { lastSprayDate, firstInfectionDate: firstFavorableRunEnd(rows) }
+}
+
+/** The natural Gubler-Thomas ignition: consecutive calendar days, a day without data breaks the run. */
+function firstFavorableRunEnd(rows: DailyRisk[]): string | undefined {
+  let run = 0
+  let previous: string | undefined
+  for (const row of rows) {
+    const continues = previous !== undefined && row.date === addDaysUTC(previous, 1)
+    run = row.powderyFavorableDay === true ? (continues ? run + 1 : 1) : 0
+    previous = row.date
+    if (run >= GUBLER_THOMAS.IGNITION_CONSECUTIVE_DAYS) return row.date
+  }
+  return undefined
 }
 
 export function hasHighRiskAhead(results: RiskResult[], today: string, days = 7): boolean {

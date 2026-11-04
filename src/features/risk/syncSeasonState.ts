@@ -18,6 +18,7 @@ import {
   goidanichDisplayPct,
   groupByDay,
   initialGoidanichCycleState,
+  powderyFavorableDay,
   resolveGublerStart,
   secondarySeasonEnded,
   type DayHours,
@@ -42,6 +43,7 @@ const degreeSumKey = (vineyardId: number, year: number, regionProfileId: string)
   `degreeSum:${vineyardId}:${year}:${regionProfileId}`
 const goidanichKey = (vineyardId: number, year: number) => `goidanichState:${vineyardId}:${year}`
 const gublerThomasKey = (vineyardId: number, year: number) => `gublerThomasState:${vineyardId}:${year}`
+const powderyFavorableKey = (vineyardId: number, year: number) => `powderyFavorable:${vineyardId}:${year}`
 /** Written by older versions, whose seasons were computed from ERA5. Its presence asks for one replay. */
 const legacySourceLogKey = (vineyardId: number, year: number) => `daySource:${vineyardId}:${year}`
 
@@ -341,6 +343,39 @@ async function runSeasonSync(
     for (const [date, score] of scoreByDate) patchFor(date).gublerScore = score
   } catch {
     failedSections.push('gublerThomas')
+  }
+
+  // 5) Favourable days for powdery mildew, from the season start regardless of sprays.
+  // The state is the current run of favourable days, the days themselves go to the snapshots.
+  try {
+    const key = powderyFavorableKey(vineyard.id, year)
+    const seasonStart = phenology.budbreak ?? `${year}-01-01`
+    const prepared = await prepareSyncDays(
+      vineyard,
+      key,
+      seasonStart,
+      elapsedCachedDays,
+      syncWindow,
+      fetchHistoricalHourly,
+      rebuildAll,
+    )
+    addElapsed(prepared.days)
+
+    await syncDailyAccumulator<number>({
+      settingsKey: key,
+      resetFromDate: seasonStart,
+      initialState: 0,
+      days: prepared.days,
+      fresh: prepared.fresh,
+      fromCheckpoint: prepared.fromCheckpoint,
+      checkpointBefore: windowStart,
+      step: (run, day) => (powderyFavorableDay(day.hours) ? run + 1 : 0),
+      onDay: (day) => {
+        patchFor(day.date).powderyFavorableDay = powderyFavorableDay(day.hours)
+      },
+    })
+  } catch {
+    failedSections.push('powderyFavorable')
   }
 
   // Days after a downy spray and before the next event have no Goidanich value, clear old ones.

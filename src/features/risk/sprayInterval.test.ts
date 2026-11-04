@@ -12,8 +12,9 @@ import { addSpray } from '../journal/spraysRepo'
 import { localDateKey } from '../weather/format'
 import { getSprayIntervalAnchors, hasHighRiskAhead, sprayIntervalWarning, type SprayIntervalInput } from './sprayInterval'
 
-const VINEYARD_ID = 555000111
+const VINEYARD_ID = 555000333
 const now = '2026-01-01T00:00:00.000Z'
+const BUDBREAK = '2026-04-20'
 
 const base: SprayIntervalInput = {
   today: '2026-06-20',
@@ -22,6 +23,17 @@ const base: SprayIntervalInput = {
   lastSprayDate: '2026-06-10',
   seasonEndMonthDay: '10-31',
   highRiskAhead: false,
+}
+
+function favorableDays(days: Record<string, boolean | null>) {
+  return db.dailyRisk.bulkAdd(
+    Object.entries(days).map(([date, favorable]) => ({
+      vineyardId: VINEYARD_ID,
+      date,
+      source: 'historical-forecast' as const,
+      powderyFavorableDay: favorable,
+    })),
+  )
 }
 
 function spray(date: string, target: SprayTarget) {
@@ -81,7 +93,7 @@ describe('getSprayIntervalAnchors', () => {
     await spray('2026-06-15', 'powdery')
 
     expect((await getSprayIntervalAnchors(VINEYARD_ID, 2026, 'downy')).lastSprayDate).toBe('2026-06-01')
-    expect((await getSprayIntervalAnchors(VINEYARD_ID, 2026, 'powdery')).lastSprayDate).toBe('2026-06-15')
+    expect((await getSprayIntervalAnchors(VINEYARD_ID, 2026, 'powdery', BUDBREAK)).lastSprayDate).toBe('2026-06-15')
   })
 
   it('ignores sprays from an earlier season', async () => {
@@ -97,41 +109,49 @@ describe('getSprayIntervalAnchors', () => {
     expect((await getSprayIntervalAnchors(VINEYARD_ID, 2026, 'downy')).firstInfectionDate).toBe('2026-05-20')
   })
 
-  it('takes the first day with a Gubler-Thomas value as the powdery start', async () => {
-    const row = { vineyardId: VINEYARD_ID, source: 'historical-forecast' as const, goidanichPct: null }
-    await db.dailyRisk.bulkAdd([
-      { ...row, date: '2026-05-01', gublerScore: null },
-      { ...row, date: '2026-05-02', gublerScore: 60 },
-      { ...row, date: '2026-05-03', gublerScore: 80 },
-    ])
+  it('takes the third of the first three favourable days in a row as the powdery start', async () => {
+    await favorableDays({ '2026-05-01': true, '2026-05-02': false, '2026-05-03': true, '2026-05-04': true, '2026-05-05': true })
 
-    expect((await getSprayIntervalAnchors(VINEYARD_ID, 2026, 'powdery')).firstInfectionDate).toBe('2026-05-02')
+    expect((await getSprayIntervalAnchors(VINEYARD_ID, 2026, 'powdery', BUDBREAK)).firstInfectionDate).toBe('2026-05-05')
     expect((await getSprayIntervalAnchors(VINEYARD_ID, 2026, 'downy')).firstInfectionDate).toBeUndefined()
   })
 
-  it('does not take an index started by a preventive powdery spray as an ignition', async () => {
-    const row = { vineyardId: VINEYARD_ID, source: 'historical-forecast' as const, goidanichPct: null }
-    await spray('2026-05-01', 'powdery')
-    await db.dailyRisk.bulkAdd([
-      { ...row, date: '2026-05-01', gublerScore: null },
-      { ...row, date: '2026-05-02', gublerScore: 0 },
-      { ...row, date: '2026-05-03', gublerScore: 20 },
-    ])
+  it('has no powdery start without a budbreak date, or from days before budbreak', async () => {
+    await favorableDays({ '2026-04-10': true, '2026-04-11': true, '2026-04-12': true })
 
-    const anchors = await getSprayIntervalAnchors(VINEYARD_ID, 2026, 'powdery')
-    expect(anchors.firstInfectionDate).toBeUndefined()
+    expect((await getSprayIntervalAnchors(VINEYARD_ID, 2026, 'powdery')).firstInfectionDate).toBeUndefined()
+    expect((await getSprayIntervalAnchors(VINEYARD_ID, 2026, 'powdery', BUDBREAK)).firstInfectionDate).toBeUndefined()
+  })
+
+  it('lets a day without data break the run', async () => {
+    await favorableDays({ '2026-05-01': true, '2026-05-02': null, '2026-05-03': true, '2026-05-04': true })
+    expect((await getSprayIntervalAnchors(VINEYARD_ID, 2026, 'powdery', BUDBREAK)).firstInfectionDate).toBeUndefined()
+  })
+
+  it('lets a missing day break the run', async () => {
+    await favorableDays({ '2026-05-01': true, '2026-05-02': true, '2026-05-04': true })
+    expect((await getSprayIntervalAnchors(VINEYARD_ID, 2026, 'powdery', BUDBREAK)).firstInfectionDate).toBeUndefined()
+  })
+
+  it('says nothing after a preventive spray without favourable days', async () => {
+    await spray('2026-05-01', 'powdery')
+    await favorableDays({ '2026-05-02': false, '2026-05-03': true, '2026-05-04': false })
+
+    const anchors = await getSprayIntervalAnchors(VINEYARD_ID, 2026, 'powdery', BUDBREAK)
     expect(sprayIntervalWarning({ ...base, ...anchors, today: '2026-05-20' })).toBeNull()
   })
 
-  it('keeps a natural ignition from before the first spray', async () => {
-    const row = { vineyardId: VINEYARD_ID, source: 'historical-forecast' as const, goidanichPct: null }
-    await spray('2026-05-03', 'powdery')
-    await db.dailyRisk.bulkAdd([
-      { ...row, date: '2026-05-02', gublerScore: 60 },
-      { ...row, date: '2026-05-04', gublerScore: 50 },
-    ])
+  it('counts from a preventive spray once three favourable days follow it', async () => {
+    await spray('2026-05-01', 'powdery')
+    await favorableDays({ '2026-05-06': true, '2026-05-07': true, '2026-05-08': true })
 
-    expect((await getSprayIntervalAnchors(VINEYARD_ID, 2026, 'powdery')).firstInfectionDate).toBe('2026-05-02')
+    const anchors = await getSprayIntervalAnchors(VINEYARD_ID, 2026, 'powdery', BUDBREAK)
+    expect(anchors.firstInfectionDate).toBe('2026-05-08')
+    expect(sprayIntervalWarning({ ...base, ...anchors, today: '2026-05-11' })?.reasons[0]).toEqual({
+      key: 'risk.sprayInterval.sinceSpray',
+      params: { days: 10, limit: 10 },
+      dates: { date: '2026-05-01' },
+    })
   })
 })
 
