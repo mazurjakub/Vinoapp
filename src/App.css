@@ -119,6 +119,14 @@ button {
 .growth-stage-editor,
 .general-settings,
 .risk-block,
+.journal-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
 .vineyard-card {
   cursor: pointer;
   border: 2px solid var(--border);
@@ -375,14 +383,6 @@ button {
 
 .journal-section {
   margin-bottom: 24px;
-}
-
-.journal-form {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 16px;
 }
 
 .journal-list {
