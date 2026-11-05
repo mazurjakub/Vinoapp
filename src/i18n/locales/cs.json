@@ -24,6 +24,7 @@
     "updateForecast": "Aktualizovat předpověď",
     "updating": "Aktualizuji…",
     "lastDataShown": "Zobrazena jsou poslední stažená data.",
+    "attribution": "Data o počasí:",
     "columns": {
       "day": "Den",
       "hour": "Hod.",

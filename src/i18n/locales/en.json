@@ -24,6 +24,7 @@
     "updateForecast": "Update forecast",
     "updating": "Updating…",
     "lastDataShown": "Showing the last downloaded data.",
+    "attribution": "Weather data:",
     "columns": {
       "day": "Day",
       "hour": "Hour",

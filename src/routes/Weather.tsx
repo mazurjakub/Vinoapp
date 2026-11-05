@@ -101,6 +101,10 @@ function Weather() {
           </div>
         </details>
       )}
+      <p className="data-attribution">
+        {t('weather.attribution')} <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo.com</a> (
+        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>)
+      </p>
     </section>
   )
 }
