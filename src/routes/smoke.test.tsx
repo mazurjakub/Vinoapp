@@ -25,7 +25,7 @@ const PAGES = [
   { path: '/settings', title: 'Nastavení' },
 ]
 
-const PLOT_NAME = 'Testovací parcela'
+const PLOT_NAME = 'Test plot'
 // Mid-season, so the test does not depend on the real date: after the season end
 // (31. 10.) the Goidanich panel has no values and draws no event marker.
 vi.useFakeTimers({ toFake: ['Date'], now: new Date('2026-07-15T12:00:00') })
@@ -99,7 +99,7 @@ async function fillDatabase() {
   await db.sprays.add({
     vineyardId: vineyardId as number,
     datetime: `${addDaysUTC(today, -10)}T08:00`,
-    product: 'Testovací přípravek',
+    product: 'Test product',
     activeSubstance: 'test',
     dose: '1,5 l/ha',
     target: 'powdery',

@@ -20,7 +20,7 @@ export interface CareTreatment {
   doseKgHa: { min: number; max: number } | null
   /** Subset of the parent stage's targets this item is aimed at. */
   targets: string[]
-  /** Only for real alternatives against the same disease ("nebo"). */
+  /** Only for real alternatives against the same disease ("or" in the source book). */
   group?: 'A' | 'B'
   optional?: boolean
   note?: string | null
