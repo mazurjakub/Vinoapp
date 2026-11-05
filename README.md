@@ -105,7 +105,7 @@ Tests never touch the network; `src/test/setupNoNetwork.ts` replaces `fetch` wit
 
 ## Development
 
-Requires Node `^22.22.2`, `^24.15.0` or `>=26` (see `engines` in `package.json`).
+Requires Node `^22.22.2`, `^24.15.0` or `>=26` (see `engines` in `package.json`). The version used for development, CI and Cloudflare Pages is pinned in `.nvmrc`.
 
 ```
 npm install
@@ -124,7 +124,6 @@ In the Cloudflare dashboard choose **Workers & Pages → Create → Pages → Co
 - **Root directory:** empty (repository root)
 - **Build command:** `npm run build`
 - **Build output directory:** `dist`
-- **Environment variable:** `NODE_VERSION` = `24`
 
 Files from `public/` are copied to `dist/` during the build and Cloudflare Pages reads them from the root of the deployed output:
 
