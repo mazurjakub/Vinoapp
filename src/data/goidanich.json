@@ -1,7 +1,7 @@
 {
   "_source": "Perez-Exposito et al. (2017), VineSens, Sensors 17(3), 465, Table 1 (Goidanich table). Transcribed by hand from a screenshot supplied by the project author.",
   "_verified": "2026-11-04",
-  "_howToVerify": "Verified on 2026-11-04: all 53 cells compared by script with Table 1 in the open-access full text (Europe PMC, PMC5375751, the same article as https://www.mdpi.com/1424-8220/17/3/465). No differences.",
+  "_howToVerify": "Verified on 2026-11-04: all 53 rows (106 values) compared by script with Table 1 in the open-access full text (Europe PMC, PMC5375751, the same article as https://www.mdpi.com/1424-8220/17/3/465). No differences.",
   "_notes": [
     "dailyDevelopmentPct is the percentage of infection development added for one day.",
     "The paper states that from 25 C the development is constant. The screenshot shows only the first sub-row for 25 C.",
