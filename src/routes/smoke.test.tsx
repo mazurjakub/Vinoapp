@@ -19,10 +19,10 @@ import { SelectedVineyardProvider } from '../state/SelectedVineyardContext'
 
 const PAGES = [
   { path: '/', title: 'Přehled' },
-  { path: '/pocasi', title: 'Počasí' },
-  { path: '/denik', title: 'Deník' },
-  { path: '/uroda', title: 'Úroda' },
-  { path: '/nastaveni', title: 'Nastavení' },
+  { path: '/weather', title: 'Počasí' },
+  { path: '/journal', title: 'Deník' },
+  { path: '/harvest', title: 'Úroda' },
+  { path: '/settings', title: 'Nastavení' },
 ]
 
 const PLOT_NAME = 'Testovací parcela'
@@ -173,7 +173,7 @@ describe('main pages', () => {
 
   it('draws the charts on the weather page, without a marker for the revoked event', async () => {
     await fillDatabase()
-    const container = await renderPage('/pocasi', 'Počasí')
+    const container = await renderPage('/weather', 'Počasí')
     await waitFor(() => expect(container.querySelectorAll('.recharts-line').length).toBeGreaterThan(0), { timeout: 3000 })
     const legend = [...container.querySelectorAll('.chart-legend li')].map((item) => item.textContent)
     expect(legend.filter((label) => label === 'Primární infekce plísně')).toHaveLength(1)

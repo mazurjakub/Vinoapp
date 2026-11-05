@@ -16,10 +16,10 @@ import './App.css'
 
 const navItems = [
   { to: '/', key: 'nav.overview' },
-  { to: '/pocasi', key: 'nav.weather' },
-  { to: '/denik', key: 'nav.journal' },
-  { to: '/uroda', key: 'nav.harvest' },
-  { to: '/nastaveni', key: 'nav.settings' },
+  { to: '/weather', key: 'nav.weather' },
+  { to: '/journal', key: 'nav.journal' },
+  { to: '/harvest', key: 'nav.harvest' },
+  { to: '/settings', key: 'nav.settings' },
 ] as const
 
 function App() {
@@ -30,11 +30,11 @@ function App() {
       <main className="app-content">
         <Routes>
           <Route path="/" element={<Overview />} />
-          <Route path="/pocasi" element={<Weather />} />
-          <Route path="/denik" element={<Journal />} />
-          <Route path="/uroda" element={<Harvest />} />
-          <Route path="/plan-pece" element={<CarePlan />} />
-          <Route path="/nastaveni" element={<Settings />} />
+          <Route path="/weather" element={<Weather />} />
+          <Route path="/journal" element={<Journal />} />
+          <Route path="/harvest" element={<Harvest />} />
+          <Route path="/care-plan" element={<CarePlan />} />
+          <Route path="/settings" element={<Settings />} />
         </Routes>
       </main>
       <nav className="app-nav">

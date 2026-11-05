@@ -27,7 +27,7 @@ function RiskPanel({ vineyardId }: RiskPanelProps) {
           icon="weather"
           title={t('risk.noWeatherData')}
           description={t('risk.noWeatherDataHint')}
-          actionTo="/pocasi"
+          actionTo="/weather"
           actionLabel={t('risk.downloadForecast')}
         />
       </div>

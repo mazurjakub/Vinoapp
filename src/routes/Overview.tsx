@@ -21,7 +21,7 @@ function Overview() {
       {selectedVineyardId && <RiskPanel vineyardId={selectedVineyardId} />}
       {selectedVineyardId && (
         <p>
-          <Link to="/plan-pece">{t('overview.carePlanLink')}</Link>
+          <Link to="/care-plan">{t('overview.carePlanLink')}</Link>
         </p>
       )}
     </section>
