@@ -18,7 +18,7 @@ import { groupByDay } from './weatherMath'
 
 const SOURCE =
   'Goidanich table and algorithm from Pérez-Expósito et al. (2017), VineSens. ' +
-  'Unverified model; the table transcription contains uncertain cells.'
+  'Unverified model; the published table contains three suspicious values, kept as published.'
 
 export interface GoidanichDayResult extends RiskResult {
   cycleStatus: GoidanichCycleStatus
