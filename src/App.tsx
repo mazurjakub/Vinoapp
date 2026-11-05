@@ -5,7 +5,7 @@
  */
 
 import { useTranslation } from 'react-i18next'
-import { NavLink, Route, Routes } from 'react-router-dom'
+import { Navigate, NavLink, Route, Routes } from 'react-router-dom'
 import Overview from './routes/Overview'
 import Weather from './routes/Weather'
 import Journal from './routes/Journal'
@@ -35,6 +35,7 @@ function App() {
           <Route path="/harvest" element={<Harvest />} />
           <Route path="/care-plan" element={<CarePlan />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
       <nav className="app-nav">
