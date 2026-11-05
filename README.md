@@ -8,7 +8,7 @@ The UI is in Czech and English. All data stays in the browser; there is no backe
 
 ## Disclaimer
 
-The models give an indicative estimate only and have not been validated for Moravia. The decision to spray stays with the user. The weather comes from a numerical model, not from a station in the vineyard.
+The app is a helper for keeping track of the season, not agronomic advice. Its risk estimates are indicative only and have not been validated for Moravia or any other region. The decision whether and when to spray stays with the user, who should follow the official situation reports and the product labels. The weather comes from a numerical model, not from a station in the vineyard. See [Known limitations](#known-limitations) for the specific unverified assumptions.
 
 ## Features
 
@@ -140,10 +140,36 @@ Checks after deployment:
 
 ## Known limitations
 
+### General
+
 - Only one Goidanich cycle is tracked at a time; an event during a running cycle does not start a new one.
 - Model weather for a grid cell can differ noticeably from the conditions in a specific vineyard.
-- The 35 °C rule of Gubler-Thomas ("more than 15 minutes") is approximated with hourly data.
 - Data lives in a single browser; moving to another device is done by export and import.
+- Warnings are only shown while the app is open; there are no push notifications.
+
+### Unverified assumptions
+
+These are documented in the code and stay open until they can be checked against a source or local observations.
+
+**Downy mildew, primary infection**
+- The `cz-morava` thresholds come from regional situation reports (2009, 2012, 2025), not from a peer-reviewed model, and are only partly verified.
+- The exact start date of the oospore maturity degree sum (SET8,0, threshold 170) is not confirmed; the app counts it from budbreak (`TODO` in `src/rules/regionProfiles.ts`).
+- Rainfall is summed per calendar day, not over a rolling 24–48 h window.
+- The `eu-generic` profile uses the 3-10 rule, which is not verified for any specific region.
+- The incubation period is interpolated linearly between three anchor points from the literature (14 °C / 10 days, 18 °C / 6 days, 24 °C / 4 days); the interpolation and the clamping outside that range are the app's own choice.
+
+**Downy mildew, secondary infection (Goidanich)**
+- Three values in the published table look like typos (12 °C / 0 / below 75%, 16 °C / 50 / below 75%, 18 °C / 25 / from 75%). They are kept as published.
+- The table's 0/25/50/75 sub-columns are not explained in the paper; reading them as the development already reached is an assumption.
+- The paper does not say whether the 75% humidity split refers to the daily mean or to hours; the app uses the daily mean.
+- Rounding the mean temperature to a table row, the 18-hour minimum for a complete day, the 21-day stall limit and the 31 October season end have no source.
+- The paper's extra conditions (rain, two hours of humidity above 60%) come from an unclear figure and are not used by default.
+
+**Powdery mildew (Gubler-Thomas)**
+- The index is a Californian model; how well it transfers to Moravia is unverified, and every reason shown in the app marks it as indicative.
+- The original Gubler et al. (1999) paper has not been read; the implementation follows the secondary sources from UC Davis and UC IPM.
+- The rule "35 °C or more for over 15 minutes" is approximated as at least one hour at 35 °C, because the weather data is hourly.
+- The published risk bands leave gaps (31–39 and 51–59); the app assigns them to the higher band.
 
 ## License and data sources
 
