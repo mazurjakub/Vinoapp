@@ -1,5 +1,7 @@
 # Vinařský deník (Vineyard Diary)
 
+[![CI](https://github.com/mazurjakub/Vinoapp/actions/workflows/ci.yml/badge.svg)](https://github.com/mazurjakub/Vinoapp/actions/workflows/ci.yml)
+
 An offline-first PWA for small and hobby winegrowers. It takes the Open-Meteo forecast and estimates the risk of grapevine downy mildew (primary infection and secondary infection using the Goidanich index) and powdery mildew (Gubler-Thomas index). It also keeps a spray and work journal and harvest records, and it works offline.
 
 The UI is in Czech and English. All data stays in the browser; there is no backend and no account.
