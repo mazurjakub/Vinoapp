@@ -144,3 +144,11 @@ Checks after deployment:
 - Model weather for a grid cell can differ noticeably from the conditions in a specific vineyard.
 - The 35 °C rule of Gubler-Thomas ("more than 15 minutes") is approximated with hourly data.
 - Data lives in a single browser; moving to another device is done by export and import.
+
+## License and data sources
+
+The source code is licensed under the [MIT License](LICENSE). The license applies to the code only. The following data comes from third parties, keeps its own terms and is cited here:
+
+- **Goidanich table** (`src/data/goidanich.json`): Table 1 of Pérez-Expósito, J. P., Fernández-Caramés, T. M., Fraga-Lamas, P., & Castedo, L. (2017). VineSens: An Eco-Smart Decision-Support Viticulture System. *Sensors*, 17(3), 465. https://doi.org/10.3390/s17030465. Published under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+- **Organic care plan** (`src/data/carePlan.cz-bio.json`): adapted from FiBL / Bioinstitut, *Ochrana révy vinné v ekologickém vinohradnictví před hlavními chorobami a škůdci*, 2nd edition, 2008 (Czech adaptation 12/2007). https://www.fibl.org/fileadmin/documents/shop/4371-protection-viticulture-cz.pdf. Page numbers are kept in the `sourcePages` fields.
+- **Weather data**: [Weather data by Open-Meteo.com](https://open-meteo.com/), licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). This covers the data the app downloads at runtime and the recorded weather in `src/rules/fixtures/goidanichVelkePavlovice2026.json`.
