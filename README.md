@@ -1,65 +1,145 @@
-# Vinařský deník
+# Vinařský deník (Vineyard Diary)
 
-PWA pro malé a domácí vinaře. Z předpovědi Open-Meteo počítá riziko plísně révové (primární infekce a sekundární infekce podle Goidanichova indexu) a padlí (Gubler-Thomas). Obsahuje deník postřiků a prací a záznamy úrody a funguje i offline.
+An offline-first PWA for small and hobby winegrowers. It takes the Open-Meteo forecast and estimates the risk of grapevine downy mildew (primary infection and secondary infection using the Goidanich index) and powdery mildew (Gubler-Thomas index). It also keeps a spray and work journal and harvest records, and it works offline.
 
-## Upozornění
+The UI is in Czech and English. All data stays in the browser; there is no backend and no account.
 
-Modely jsou orientační a pro Moravu neověřené. Rozhodnutí o postřiku zůstává na uživateli. Počasí je modelové, nepochází ze stanice ve vinici.
+## Disclaimer
 
-## Stack
+The models give an indicative estimate only and have not been validated for Moravia. The decision to spray stays with the user. The weather comes from a numerical model, not from a station in the vineyard.
 
-Vite, React, TypeScript, Dexie (IndexedDB), i18next, Recharts, vite-plugin-pwa, Vitest.
+## Features
 
-## Struktura projektu
+- **Plots (vineyards)** with location, varieties and region profile (`cz-morava` or `eu-generic`)
+- **Risk overview** per plot: downy mildew primary infection, Goidanich secondary infection cycles, Gubler-Thomas powdery mildew index, each with a plain-language reason for the current level
+- **Spray interval warning** when the protection from the last spray has probably run out and high risk is ahead
+- **Weather chart** with past days and the 7-day forecast, risk zones, infection events and Goidanich cycles
+- **Journal** of sprays and vineyard work, plus growth stage (phenology) dates for the season
+- **Care plan** timeline for organic growing, mapped to the current growth stage
+- **Harvest records** with a per-year summary chart
+- **Data export and import** to JSON as a backup
+- **Installable PWA** that keeps working without a connection
 
-- `src/rules`: pravidlový engine (výpočty rizika bez vazby na UI)
-- `src/data`: tabulka Goidanich a plán péče (JSON)
-- `src/features`, `src/routes`: funkce aplikace a stránky
-- `src/db`: databáze a migrace
-- `src/weather`: stahování počasí z Open-Meteo
-- `src/i18n/locales`: překlady (`cs.json`, `en.json`)
-- Testy: `*.test.ts` a `*.test.tsx` vedle testovaného kódu, smoke testy stránek v `src/routes/smoke.test.tsx`, nastavení a pomocné funkce testů v `src/test`
+## How it works
 
-## Vývoj
+```
+Open-Meteo (Historical Forecast / Forecast / ERA5 fallback)
+        │  hourly temperature, humidity, dew point, precipitation
+        ▼
+  weather cache (IndexedDB, 7 days back + 7 days ahead)
+        │
+        ▼
+  syncSeasonState ──► daily accumulators (one per model and plot)
+        │               state + last processed day + checkpoint
+        ▼
+  rules engine (src/rules, pure functions)
+        │  downy primary · Goidanich · Gubler-Thomas · incubation
+        ▼
+  infection events + daily risk snapshots (IndexedDB)
+        │
+        ▼
+  useVineyardRisk hook ──► Overview, Weather chart, warnings
+```
 
-Vyžaduje Node `^22.22.2`, `^24.15.0` nebo `>=26` (viz `engines` v `package.json`).
+### Weather data
+
+Days older than 2 days come from the Open-Meteo Historical Forecast API, newer days and the forecast from the Forecast API. The ERA5 archive is only a fallback for a day that the Historical Forecast API does not return, returns with fewer than 18 hours, or fails on. The same rule applies to the cache, the charts, the tables and the calculations, so every part of the app sees the same numbers.
+
+### Season state and recalculation
+
+Each model is a daily step function `(state, day) => state`. A generic accumulator folds days into a saved season state and stores the last processed day and a checkpoint. On every sync the last 7 days are recomputed from the checkpoint, because model weather for recent days still changes; older days are final. This keeps the calculation deterministic and avoids recomputing the whole season on every page load. Recalculation runs one at a time per plot, and a run with the same inputs as the previous one is skipped.
+
+Infection events that stop meeting the conditions after a recalculation are marked as revoked instead of deleted, and they become active again if the conditions return. Manually entered events are never revoked automatically.
+
+### Models
+
+| Model | Disease | Input | Source |
+|---|---|---|---|
+| Primary infection | Downy mildew | Daily mean/min temperature, rainfall, degree sum from budbreak (`cz-morava`) or the 3-10 rule (`eu-generic`) | Regional profile |
+| Goidanich index | Downy mildew (secondary) | Daily mean temperature and relative humidity, table of daily development | Pérez-Expósito et al. (2017), VineSens |
+| Incubation period | Downy mildew | Daily mean temperature, interpolated between 14 °C/10 days, 18 °C/6 days, 24 °C/4 days | Literature anchor points |
+| Gubler-Thomas | Powdery mildew | Hours between 21 and 30 °C, hours at 35 °C and above | UC Davis / UC IPM risk index |
+
+Wherever a source leaves something undefined (how the daily mean is computed, which table column to use, the gaps between risk bands), the app makes its own choice and says so in a comment next to the code. Examples:
+
+- Goidanich temperature is rounded to a whole degree (half up) without interpolation.
+- A day with fewer than 18 valid hours adds nothing to the index.
+- Accumulated percentages are rounded to 2 decimal places so that floating point never decides whether a threshold is crossed.
+- The undefined Gubler-Thomas gaps (31–39 and 51–59) go to the higher band to stay on the cautious side.
+
+### Data storage
+
+Data is stored in IndexedDB through Dexie. The schema is versioned and has migrations (currently version 7), which are covered by tests. A backup is made by exporting to JSON in Settings; the import validates the file before writing it.
+
+## Tech stack
+
+Vite, React 19, TypeScript, React Router, Dexie (IndexedDB), i18next, Recharts, vite-plugin-pwa (Workbox), Vitest, Testing Library, fake-indexeddb.
+
+## Project structure
+
+```
+src/
+  rules/        risk models as pure functions, no UI or database dependencies
+  features/     app features (risk, weather chart, journal, harvest, care plan, data, ...)
+                each with its components, repository and tests
+  routes/       pages
+  db/           Dexie schema, migrations and settings
+  weather/      Open-Meteo provider behind a WeatherProvider interface
+  data/         Goidanich table and the organic care plan (JSON)
+  i18n/         translations (cs.json, en.json) and number formatting
+  state/        selected plot context
+  test/         test setup (IndexedDB, no network) and helpers
+```
+
+## Testing
+
+Tests sit next to the code they test (`*.test.ts`, `*.test.tsx`). The focus is on the domain logic:
+
+- every risk model, including edge cases at thresholds and incomplete days
+- a regression test of the Goidanich index against a recorded season (`src/rules/fixtures/goidanichVelkePavlovice2026.json`)
+- an equivalence test checking that processing day by day and processing after a gap of several days give the same state and snapshots
+- database migrations, export and import
+- smoke tests that render every page on an empty and on a filled database (`src/routes/smoke.test.tsx`)
+
+Tests never touch the network; `src/test/setupNoNetwork.ts` replaces `fetch` with fixed weather data.
+
+## Development
+
+Requires Node `^22.22.2`, `^24.15.0` or `>=26` (see `engines` in `package.json`).
 
 ```
 npm install
-npm run dev
-npm run build
-npm run preview
+npm run dev        # dev server on http://localhost:5173, no service worker
+npm run build      # type check and production build to dist/
+npm run preview    # serves dist/, the only way to test the service worker and offline mode locally
 npm run test
 npm run lint
 npm run typecheck
 ```
 
-`npm run dev` spustí vývojový server na `http://localhost:5173`, bez service workeru. `npm run build` zkontroluje typy a sestaví aplikaci do `dist/`. `npm run preview` servíruje obsah `dist/`, a proto jen na něm lze lokálně ověřit service worker a offline chování.
+## Deployment to Cloudflare Pages
 
-## Nasazení na Cloudflare Pages
+In the Cloudflare dashboard choose **Workers & Pages → Create → Pages → Connect to Git**, select the repository and set:
 
-V Cloudflare dashboardu zvolit **Workers & Pages → Create → Pages → Connect to Git**, vybrat repozitář a nastavit:
-
-- **Root directory:** prázdné (kořen repozitáře)
+- **Root directory:** empty (repository root)
 - **Build command:** `npm run build`
 - **Build output directory:** `dist`
-- **Proměnná prostředí:** `NODE_VERSION` = `24`
+- **Environment variable:** `NODE_VERSION` = `24`
 
-Soubory z `public/` se při buildu zkopírují do `dist/` a Cloudflare Pages je čte z kořene nasazeného výstupu:
+Files from `public/` are copied to `dist/` during the build and Cloudflare Pages reads them from the root of the deployed output:
 
-- **`public/_redirects`:** `/*  /index.html  200`, fallback pro routing v prohlížeči. Bez něj by reload na `/pocasi` vrátil 404.
-- **`public/_headers`:** cache hlavičky. `/assets/*` a `workbox-*.js` mají hash v názvu, takže se cachují natrvalo. `sw.js`, `registerSW.js`, `manifest.webmanifest` a `index.html` hash nemají a musí se vždy znovu ověřit, jinak by service worker mohl uváznout na staré verzi.
+- **`public/_redirects`:** `/*  /index.html  200`, a fallback for client-side routing. Without it a reload on `/weather` would return 404.
+- **`public/_headers`:** cache headers. `/assets/*` and `workbox-*.js` have a hash in their name, so they are cached permanently. `sw.js`, `registerSW.js`, `manifest.webmanifest` and `index.html` have no hash and must always be revalidated, otherwise the service worker could get stuck on an old version.
 
-Kontrola po nasazení:
+Checks after deployment:
 
-1. Reload na `/pocasi` zobrazí stránku, ne 404.
-2. Aplikace jde nainstalovat jako PWA.
-3. `sw.js` má v DevTools (Network) hlavičku `Cache-Control: no-cache`.
+1. A reload on `/weather` shows the page, not a 404.
+2. The app can be installed as a PWA.
+3. `sw.js` has the `Cache-Control: no-cache` header in DevTools (Network).
 
-## Data
+## Known limitations
 
-Všechna data jsou v IndexedDB v prohlížeči. Aplikace nemá backend ani účty. Záloha se dělá exportem do JSON v Nastavení.
-
-## Zdroje počasí
-
-Dny starší než 2 dny pocházejí z Open-Meteo Historical Forecast API, novější dny a předpověď z Forecast API. ERA5 archiv slouží jen jako záloha, když Historical Forecast den nevrátí. Stejné pravidlo platí pro cache, grafy, tabulky i výpočty.
+- Only one Goidanich cycle is tracked at a time; an event during a running cycle does not start a new one.
+- Model weather for a grid cell can differ noticeably from the conditions in a specific vineyard.
+- The 35 °C rule of Gubler-Thomas ("more than 15 minutes") is approximated with hourly data.
+- Data lives in a single browser; moving to another device is done by export and import.
