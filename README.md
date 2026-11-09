@@ -1,4 +1,4 @@
-# Vinařský deník (Vineyard Diary)
+# Vineyard Diary
 
 [![CI](https://github.com/mazurjakub/Vinoapp/actions/workflows/ci.yml/badge.svg)](https://github.com/mazurjakub/Vinoapp/actions/workflows/ci.yml)
 
